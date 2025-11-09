@@ -4,12 +4,24 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssg.wms.inbound.repository.InboundMemberMapper">
 
+    <resultMap id="InboundWithItemsResultMap" type="com.ssg.wms.inbound.dto.InboundDTO">
+        <id property="inboundId" column="inbound_id"/>
+        <result property="warehouseId" column="warehouse_id"/>
+        <result property="warehouseName" column="warehouse_name"/>
+        <result property="memberId" column="member_id"/>
+        <result property="memberName" column="member_name"/>
+        <result property="inboundStatus" column="inbound_status"/>
+        <collection property="inboundItems" ofType="com.ssg.wms.inbound.dto.InboundItemDTO">
+            <id property="inboundItemId" column="item_id"/>
+            <result property="productId" column="product_id"/>
+            <result property="productName" column="product_name"/>
+            <result property="amount" column="amount"/>
+        </collection>
+    </resultMap>
 
 <!--    // 입고 요청-->
-    <insert id="insertInbound" parameterType="com.ssg.wms.inbound.domain.InboundVO" useGeneratedKeys="true" keyProperty="inboundId">>
-        <selectKey order="AFTER" keyProperty="inboundId" resultType="long">
-            SELECT LAST_INSERT_ID()
-        </selectKey>
+    <insert id="insertInbound" parameterType="com.ssg.wms.inbound.domain.InboundVO"
+            useGeneratedKeys="true" keyProperty="inboundId">
 
         INSERT INTO inbound (
         warehouse_id,
@@ -47,30 +59,16 @@
         i.inbound_id, i.warehouse_id, w.warehouse_name,
         i.member_id, m.member_name,
         i.inbound_status,
-        ii.item_id, ii.product_id, p.product_name, ii.quantity, ii.unit
+        ii.inbound_item_id, ii.product_id, p.product_name, ii.amount
         FROM inbound i
         JOIN warehouse w ON i.warehouse_id = w.warehouse_id
         JOIN member m ON i.member_id = m.member_id
-        LEFT JOIN inbound_item ii ON i.inbound_id = ii.inbound_id
-        LEFT JOIN product p ON ii.product_id = p.product_id
+        INNER JOIN inbound_item ii ON i.inbound_id = ii.inbound_id
+        INNER JOIN product p ON ii.product_id = p.product_id
         WHERE i.inbound_id = #{inboundId}
     </select>
 
-    <resultMap id="InboundWithItemsResultMap" type="com.example.wms.dto.InboundResponseDTO">
-        <id property="inboundId" column="inbound_id"/>
-        <result property="warehouseId" column="warehouse_id"/>
-        <result property="warehouseName" column="warehouse_name"/>
-        <result property="memberId" column="member_id"/>
-        <result property="memberName" column="member_name"/>
-        <result property="inboundStatus" column="inbound_status"/>
-        <collection property="inboundItems" ofType="com.example.wms.dto.InboundItemDTO">
-            <id property="itemId" column="item_id"/>
-            <result property="productId" column="product_id"/>
-            <result property="productName" column="product_name"/>
-            <result property="quantity" column="quantity"/>
-            <result property="unit" column="unit"/>
-        </collection>
-    </resultMap>
+
 
 <!--    // 입고 요청 수정-->
 

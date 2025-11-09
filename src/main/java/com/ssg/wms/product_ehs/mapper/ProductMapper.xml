@@ -1,0 +1,15 @@
+<mapper namespace="com.ssg.wms.product.mapper.ProductMapper">
+
+    <select id="selectProductsByPartner" resultType="com.ssg.wms.product.dto.ProductDTO">
+        SELECT product_id, product_name
+        FROM product
+        WHERE partner_id = #{partnerId}
+        ORDER BY product_name
+    </select>
+
+    <select id="selectCategory" resultType="com.ssg.wms.product.dto.ProductDTO">
+        SELECT *
+        FROM category
+    </select>
+
+</mapper>

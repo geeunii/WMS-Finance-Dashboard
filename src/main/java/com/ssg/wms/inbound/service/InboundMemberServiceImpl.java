@@ -3,6 +3,8 @@ package com.ssg.wms.inbound.service;
 import com.ssg.wms.inbound.domain.InboundItemVO;
 import com.ssg.wms.inbound.domain.InboundVO;
 import com.ssg.wms.inbound.dto.InboundDTO;
+import com.ssg.wms.inbound.dto.InboundRequestDTO;
+import com.ssg.wms.inbound.dto.InboundRequestItemDTO;
 import com.ssg.wms.inbound.repository.InboundMemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,17 +18,27 @@ public class InboundMemberServiceImpl implements InboundMemberService {
 
     @Transactional
     @Override
-    public int createInbound(InboundVO inboundVO) {
+    public InboundRequestDTO createInbound(InboundRequestDTO inboundRequestDTO) {
+        InboundVO inboundVO = new InboundVO();
+        inboundVO.setInboundId(inboundRequestDTO.getMemberId());
+        inboundVO.setInboundStatus("request");
+
         inboundMemberMapper.insertInbound(inboundVO);
         int inboundId = inboundVO.getInboundId();
 
-        if (inboundVO.getInboundItems() != null) {
-            for (InboundItemVO item : inboundVO.getInboundItems()) {
-                item.setInboundId(inboundId);
-                inboundMemberMapper.insertInboundItem(item);
+        if (inboundRequestDTO.getInboundRequestItems() != null &&
+                !inboundRequestDTO.getInboundRequestItems().isEmpty()) {
+
+            for (InboundRequestItemDTO inboundItemDTO : inboundRequestDTO.getInboundRequestItems()) {
+                InboundItemVO inboundItemVO = new InboundItemVO();
+
+                inboundItemVO.setInboundId(inboundId);
+                inboundItemVO.setProductId(inboundItemDTO.getProductId());
+                inboundItemVO.setAmount(inboundItemDTO.getAmount());
+                inboundMemberMapper.insertInboundItem(inboundItemVO);
             }
         }
-        return inboundId;
+        return inboundRequestDTO;
     }
 
     @Override

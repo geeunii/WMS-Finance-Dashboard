@@ -1,13 +1,16 @@
 package com.ssg.wms.inbound.dto;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @ToString
 public class InboundDTO {
+    // 출력용 DTO
 
     private int inboundId;
     private int warehouseId;
@@ -22,5 +25,16 @@ public class InboundDTO {
     private LocalDateTime inboundUpdatedAt;
     private LocalDateTime inboundAt;
 
+    private List<InboundItemDTO> inboundItems;
+
+}
+
+@Data
+class InboundItemDTO {
+    private int inboundItemId;
+    private int inboundId;
+    private int productId;
+    private String productName;
+    private int amount;
 }
 
