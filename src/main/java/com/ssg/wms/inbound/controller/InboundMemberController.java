@@ -85,7 +85,8 @@ public class InboundMemberController {
                                  @Valid @ModelAttribute InboundRequestDTO inboundRequestDTO) {
 
         // 로그인한 사용자의 memberId 가져오기
-        Integer memberId = (Integer) session.getAttribute("loginMemberId");
+        Integer memberId = 1;
+//        Integer memberId = (Integer) session.getAttribute("loginMemberId");
         inboundRequestDTO.setMemberId(memberId);
 
         // 서비스 호출하여 DB 저장
