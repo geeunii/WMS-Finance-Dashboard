@@ -1,8 +1,8 @@
 package com.ssg.wms.finance.service;
 
-import com.ssg.wms.dto.DashboardSummaryDTO;
-import com.ssg.wms.mappers.ExpenseMapper;
-import com.ssg.wms.mappers.SalesMapper;
+import com.ssg.wms.finance.dto.DashboardSummaryDTO;
+import com.ssg.wms.finance.mappers.ExpenseMapper;
+import com.ssg.wms.finance.mappers.SalesMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

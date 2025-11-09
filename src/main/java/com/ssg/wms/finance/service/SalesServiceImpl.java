@@ -1,10 +1,10 @@
 package com.ssg.wms.finance.service;
 
-import com.ssg.wms.domain.SalesVO;
-import com.ssg.wms.dto.SalesRequestDTO;
-import com.ssg.wms.dto.SalesResponseDTO;
-import com.ssg.wms.dto.SalesSaveDTO;
-import com.ssg.wms.mappers.SalesMapper;
+import com.ssg.wms.finance.domain.SalesVO;
+import com.ssg.wms.finance.dto.SalesRequestDTO;
+import com.ssg.wms.finance.dto.SalesResponseDTO;
+import com.ssg.wms.finance.dto.SalesSaveDTO;
+import com.ssg.wms.finance.mappers.SalesMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;

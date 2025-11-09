@@ -1,6 +1,6 @@
 package com.ssg.wms.finance.service;
 
-import com.ssg.wms.dto.DashboardSummaryDTO;
+import com.ssg.wms.finance.dto.DashboardSummaryDTO;
 
 import java.util.List;
 

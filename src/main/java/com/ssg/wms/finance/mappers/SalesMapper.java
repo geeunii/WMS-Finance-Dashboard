@@ -1,8 +1,8 @@
 package com.ssg.wms.finance.mappers;
 
-import com.ssg.wms.domain.SalesVO;
-import com.ssg.wms.dto.DashboardSummaryDTO;
-import com.ssg.wms.dto.SalesRequestDTO;
+import com.ssg.wms.finance.domain.SalesVO;
+import com.ssg.wms.finance.dto.DashboardSummaryDTO;
+import com.ssg.wms.finance.dto.SalesRequestDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

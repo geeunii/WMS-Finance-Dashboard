@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ssg.wms.mappers.ExpenseMapper">
+<mapper namespace="com.ssg.wms.finance.mappers.ExpenseMapper">
 
-    <resultMap id="ExpenseResultMap" type="com.ssg.wms.domain.ExpenseVO">
+    <resultMap id="ExpenseResultMap" type="com.ssg.wms.finance.domain.ExpenseVO">
         <id property="id" column="expense_id"/>
         <result property="warehouseName" column="warehouse_name"/>
         <result property="expenseDate" column="expense_date"/>
@@ -14,7 +14,7 @@
         <result property="modDate" column="mod_date"/>
     </resultMap>
 
-    <select id="findAll" resultMap="ExpenseResultMap" parameterType="com.ssg.wms.dto.ExpenseRequestDTO">
+    <select id="findAll" resultMap="ExpenseResultMap" parameterType="com.ssg.wms.finance.dto.ExpenseRequestDTO">
         SELECT * FROM expense
         <where>
             <if test="dateFrom != null">
@@ -31,7 +31,7 @@
         LIMIT #{size} OFFSET #{offset}
     </select>
 
-    <select id="count" resultType="int" parameterType="com.ssg.wms.dto.ExpenseRequestDTO">
+    <select id="count" resultType="int" parameterType="com.ssg.wms.finance.dto.ExpenseRequestDTO">
         SELECT COUNT(*) FROM expense
         <where>
             <if test="dateFrom != null">
@@ -74,14 +74,14 @@
         WHERE expense_id = #{id}
     </delete>
 
-    <select id="findSummaryByCategory" resultType="com.ssg.wms.dto.CategorySummaryDTO">
+    <select id="findSummaryByCategory" resultType="com.ssg.wms.finance.dto.CategorySummaryDTO">
         SELECT category, SUM(amount) AS totalAmount
         FROM expense
         WHERE YEAR(expense_date) = #{year}
         GROUP BY category
     </select>
 
-    <select id="findMonthlySummary" resultType="com.ssg.wms.dto.DashboardSummaryDTO">
+    <select id="findMonthlySummary" resultType="com.ssg.wms.finance.dto.DashboardSummaryDTO">
         SELECT MONTH(expense_date) AS month, SUM(amount) AS totalExpenses
         FROM expense
         WHERE YEAR(expense_date) = #{year}

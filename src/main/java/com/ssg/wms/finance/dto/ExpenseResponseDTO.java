@@ -1,6 +1,6 @@
 package com.ssg.wms.finance.dto;
 
-import com.ssg.wms.domain.ExpenseVO;
+import com.ssg.wms.finance.domain.ExpenseVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

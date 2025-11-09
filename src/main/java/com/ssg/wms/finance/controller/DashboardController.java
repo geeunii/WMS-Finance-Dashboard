@@ -1,9 +1,9 @@
 package com.ssg.wms.finance.controller;
 
-import com.ssg.wms.dto.CategorySummaryDTO;
-import com.ssg.wms.dto.DashboardSummaryDTO;
-import com.ssg.wms.service.DashboardService;
-import com.ssg.wms.service.ExpenseService;
+import com.ssg.wms.finance.dto.CategorySummaryDTO;
+import com.ssg.wms.finance.dto.DashboardSummaryDTO;
+import com.ssg.wms.finance.service.DashboardService;
+import com.ssg.wms.finance.service.ExpenseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;

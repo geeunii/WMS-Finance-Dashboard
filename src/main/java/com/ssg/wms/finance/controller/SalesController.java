@@ -1,10 +1,10 @@
 package com.ssg.wms.finance.controller;
 
-import com.ssg.wms.domain.SalesVO;
-import com.ssg.wms.dto.SalesRequestDTO;
-import com.ssg.wms.dto.SalesResponseDTO;
-import com.ssg.wms.dto.SalesSaveDTO;
-import com.ssg.wms.service.SalesService;
+import com.ssg.wms.finance.domain.SalesVO;
+import com.ssg.wms.finance.dto.SalesRequestDTO;
+import com.ssg.wms.finance.dto.SalesResponseDTO;
+import com.ssg.wms.finance.dto.SalesSaveDTO;
+import com.ssg.wms.finance.service.SalesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;

@@ -1,9 +1,9 @@
 package com.ssg.wms.finance.service;
 
-import com.ssg.wms.domain.SalesVO;
-import com.ssg.wms.dto.SalesRequestDTO;
-import com.ssg.wms.dto.SalesResponseDTO;
-import com.ssg.wms.dto.SalesSaveDTO;
+import com.ssg.wms.finance.domain.SalesVO;
+import com.ssg.wms.finance.dto.SalesRequestDTO;
+import com.ssg.wms.finance.dto.SalesResponseDTO;
+import com.ssg.wms.finance.dto.SalesSaveDTO;
 
 public interface SalesService {
     SalesResponseDTO getSales(SalesRequestDTO dto);
