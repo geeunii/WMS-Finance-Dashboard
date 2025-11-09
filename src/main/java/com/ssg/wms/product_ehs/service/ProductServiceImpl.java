@@ -15,8 +15,8 @@ public class ProductServiceImpl implements ProductService {
     private ProductMapper productMapper;
 
     @Override
-    public List<ProductDTO> getProductsByPartner(int partnerId, int categoryCd) {
-        return productMapper.selectProductsByPartner(partnerId, categoryCd);
+    public List<ProductDTO> getProductsByPartnerAndCategory(int partnerId, int categoryCd) {
+        return productMapper.selectProductsByPartnerAndCategory(partnerId, categoryCd);
     }
 
     @Override

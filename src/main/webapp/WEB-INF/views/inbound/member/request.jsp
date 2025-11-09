@@ -1,25 +1,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="../../includes/header.jsp" %>
-<%-- 여기에 내용 입력 --%>
-<div class="container mt-5">
 
+<div class="container mt-5">
     <h3>입고 요청</h3>
 
     <form id="inboundRequestForm" method="post" action="/inbound/member/request">
         <!-- 사용자 정보 (hidden) -->
         <input type="hidden" name="memberId" value="${memberId}"/>
-
-        <!-- 창고 선택 -->
-<%--        <div class="mb-3">
-            <label for="warehouseId" class="form-label">창고</label>
-            <select class="form-select" id="warehouseId" name="warehouseId" required>
-                <option value="" disabled selected>선택</option>
-                <c:forEach var="wh" items="${warehouses}">
-                    <option value="${wh.warehouseId}">${wh.warehouseName}</option>
-                </c:forEach>
-            </select>
-        </div>--%>
 
         <!-- 입고 품목 테이블 -->
         <h5>입고 품목</h5>
@@ -38,7 +26,7 @@
             <tbody>
             <tr class="inboundItemRow">
                 <td>
-                    <select name="category[0].categoryCd" class="form-select" required>
+                    <select name="category[0].categoryCd" class="form-select categorySelect" required>
                         <option value="" disabled selected>카테고리</option>
                         <c:forEach var="category" items="${categories}">
                             <option value="${category.categoryCd}">${category.categoryName}</option>
@@ -46,18 +34,12 @@
                     </select>
                 </td>
                 <td>
-                    <select name="inboundRequestItems[0].productId" class="form-select" required>
+                    <select name="inboundRequestItems[0].productId" class="form-select productSelect" required>
                         <option value="" disabled selected>상품 선택</option>
-                        <c:forEach var="p" items="${products}">
-                            <option value="${p.productId}">${p.productName}</option>
-                        </c:forEach>
                     </select>
                 </td>
-                <td><input type="number" name="inboundRequestItems[0].amount" class="form-control" min="1" required>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm removeItemBtn">삭제</button>
-                </td>
+                <td><input type="number" name="inboundRequestItems[0].quantity" class="form-control" min="1" required></td>
+                <td><button type="button" class="btn btn-danger btn-sm removeItemBtn">삭제</button></td>
             </tr>
             </tbody>
         </table>
@@ -67,39 +49,85 @@
         <button type="submit" class="btn btn-primary">입고 요청</button>
     </form>
 </div>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap Bundle (필요시) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
     let itemIndex = 1; // 신규 row 인덱스
 
-    // 서버에서 렌더링된 옵션 HTML
-    let productOptions = `
-        <option value="" disabled selected>상품 선택</option>
-        <c:forEach var="p" items="${products}">
-            <option value="${p.productId}">${p.productName}</option>
+    // 서버에서 렌더링된 카테고리 옵션 HTML
+    const categoryOptions = (() => {
+        const options = [];
+        options.push($('<option>').val('').prop('disabled', true).prop('selected', true).text('카테고리'));
+        <c:forEach var="category" items="${categories}">
+        options.push($('<option>').val('${category.categoryCd}').text('${category.categoryName}'));
         </c:forEach>
-    `;
+        return options;
+    })();
 
-    // 품목 추가
+    // row 추가
     $('#addItemBtn').click(function () {
-        let newRow = `
-        <tr class="inboundItemRow">
-            <td>
-                <select name="inboundRequestItems[${itemIndex}].productId" class="form-select" required>
-                    ${productOptions}
-                </select>
-            </td>
-            <td><input type="number" name="inboundRequestItems[${itemIndex}].amount" class="form-control" min="1" required></td>
-            <td><button type="button" class="btn btn-danger btn-sm removeItemBtn">삭제</button></td>
-        </tr>`;
+        let newRow = $('<tr>').addClass('inboundItemRow');
+
+        // 카테고리 셀
+        let categoryCell = $('<td>');
+        let categorySelect = $('<select>').addClass('form-select categorySelect').attr('required', true).attr('name', `category[${itemIndex}].categoryCd`);
+        categoryOptions.forEach(function(opt) {
+            categorySelect.append(opt.clone());
+        });
+        categoryCell.append(categorySelect);
+        newRow.append(categoryCell);
+
+        // 상품 셀
+        let productCell = $('<td>');
+        let productSelect = $('<select>').addClass('form-select productSelect').attr('required', true).attr('name', `inboundRequestItems[${itemIndex}].productId`);
+        productSelect.append($('<option>').val('').prop('disabled', true).prop('selected', true).text('상품 선택'));
+        productCell.append(productSelect);
+        newRow.append(productCell);
+
+        // 수량 셀
+        let quantityCell = $('<td>');
+        quantityCell.append($('<input>').attr('type', 'number').addClass('form-control').attr('name', `inboundRequestItems[${itemIndex}].quantity`).attr('min', 1).prop('required', true));
+        newRow.append(quantityCell);
+
+        // 삭제 버튼 셀
+        let removeCell = $('<td>');
+        removeCell.append($('<button>').attr('type', 'button').addClass('btn btn-danger btn-sm removeItemBtn').text('삭제'));
+        newRow.append(removeCell);
+
         $('#inboundItemsTable tbody').append(newRow);
         itemIndex++;
     });
 
-    // 품목 삭제
+    // row 삭제
     $(document).on('click', '.removeItemBtn', function () {
         $(this).closest('tr').remove();
     });
+
+    // 카테고리 선택 시 해당 상품만 로드
+    $(document).on('change', '.categorySelect', function () {
+        let categoryCd = $(this).val();
+        let $productSelect = $(this).closest('tr').find('.productSelect');
+
+        $.ajax({
+            url: '/inbound/member/products/byCategory',
+            type: 'GET',
+            data: { categoryCd: categoryCd },
+            success: function (products) {
+                $productSelect.empty();
+                $productSelect.append($('<option>').val('').prop('disabled', true).prop('selected', true).text('상품 선택'));
+                products.forEach(function(p) {
+                    $productSelect.append($('<option>').val(p.productId).text(p.productName));
+                });
+            },
+            error: function() {
+                alert('상품을 불러오지 못했습니다.');
+            }
+        });
+    });
 </script>
 
-
-<%-- <h4 class="fw-bold p-4">Blank Page</h4> --%>
 <%@ include file="../../includes/footer.jsp" %>

@@ -11,13 +11,11 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -59,28 +57,44 @@ public class InboundMemberController {
         log.info(categories);
 
         // 입고요청시에 볼 상품 리스트 데이터 로드
-        List<ProductDTO> products = productService.getProductsByPartner(partnerId, categoryCd);
+        List<ProductDTO> products = new ArrayList<>();
         model.addAttribute("products", products);
 
 
         return "inbound/member/request";
     }
 
+    @GetMapping("/products/byCategory")
+    @ResponseBody
+    public List<ProductDTO> getProductsByPartner(
+            @RequestParam Integer categoryCd,
+            HttpSession session) {
+
+        // 세션에서 partnerId 가져오기
+        Integer partnerId = 1; // 예제
+        // 실제 구현: session.getAttribute("loginMemberBrandId");
+
+        return productService.getProductsByPartnerAndCategory(partnerId, categoryCd);
+    }
+
 
 
     // 입고 요청
-    @PostMapping("/inbound/member/request")
-    public ResponseEntity<InboundRequestDTO> inboundRequest(HttpSession session,
-                                                            @Valid @RequestBody InboundRequestDTO inboundRequestDTO) {
+    @PostMapping("/request")
+    public String inboundRequest(HttpSession session,
+                                 @Valid @ModelAttribute InboundRequestDTO inboundRequestDTO) {
 
-        // 로그인한 사용자의 memberId 가져오도록
+        // 로그인한 사용자의 memberId 가져오기
         Integer memberId = (Integer) session.getAttribute("loginMemberId");
         inboundRequestDTO.setMemberId(memberId);
 
-        InboundRequestDTO request = inboundService.createInbound(inboundRequestDTO);
+        // 서비스 호출하여 DB 저장
+        inboundService.createInbound(inboundRequestDTO);
 
-        return ResponseEntity.ok(request);
+        // 요청 완료 후 이동할 페이지
+        return "redirect:/inbound/member/list";
     }
+
 
     // 입고 요청 목록 조회 (관리자용 - 브랜드, 상태 파라미터로 받아서 검색)
 

@@ -6,10 +6,14 @@ import com.ssg.wms.inbound.dto.InboundDTO;
 import com.ssg.wms.inbound.dto.InboundRequestDTO;
 import com.ssg.wms.inbound.dto.InboundRequestItemDTO;
 import com.ssg.wms.inbound.mappers.InboundMemberMapper;
+import com.ssg.wms.product_ehs.dto.ProductDTO;
+import com.ssg.wms.product_ehs.mappers.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Primary
@@ -17,6 +21,9 @@ public class InboundMemberServiceImpl implements InboundMemberService {
 
     @Autowired
     private InboundMemberMapper inboundMemberMapper;
+
+    @Autowired
+    private ProductMapper productMapper;
 
     @Transactional
     @Override
@@ -44,6 +51,11 @@ public class InboundMemberServiceImpl implements InboundMemberService {
             }
         }
         return inboundRequestDTO;
+    }
+
+    @Override
+    public List<ProductDTO> getProductsByPartnerAndCategory(int partnerId, int categoryCd) {
+        return productMapper.selectProductsByPartnerAndCategory(partnerId, categoryCd);
     }
 
     @Override
