@@ -17,6 +17,7 @@
             <id property="inboundItemId" column="inbound_item_id"/>
             <result property="productId" column="product_id"/>
             <result property="productName" column="product_name"/>
+            <result property="categoryName" column="category_name"/>
             <result property="quantity" column="quantity"/>
         </collection>
     </resultMap>
@@ -68,7 +69,7 @@
         JOIN partner pt ON m.partner_id = pt.partner_id
         LEFT JOIN inbound_item ii ON i.inbound_id = ii.inbound_id
         LEFT JOIN product p ON ii.product_id = p.product_id
-        LEFT JOIN category c ON p.category_id = c.category_id  -- 카테고리 조인 추가
+        LEFT JOIN category c ON p.category_cd = c.category_cd
         LEFT JOIN staff st ON i.staff_id = st.staff_id
         WHERE i.inbound_id = #{inboundId}
     </select>

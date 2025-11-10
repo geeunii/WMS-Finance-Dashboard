@@ -1,10 +1,14 @@
 package com.ssg.wms.inbound.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class InboundListDTO {
     private Long inboundId;
     private LocalDateTime inboundRequestedAt;

@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <!-- 입고 상세 모달 -->
 <div class="modal fade" id="inboundModal" tabindex="-1" aria-labelledby="inboundModalLabel" aria-hidden="true">
@@ -14,9 +14,7 @@
             <div class="modal-body">
                 <!-- 입고 기본 정보 -->
                 <div class="card mb-3">
-                    <div class="card-header bg-primary text-white">
-                        <strong>기본 정보</strong>
-                    </div>
+                    <div class="card-header bg-primary text-white"><strong>기본 정보</strong></div>
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-4">
@@ -70,9 +68,7 @@
 
                 <!-- 상품 리스트 -->
                 <div class="card">
-                    <div class="card-header bg-success text-white">
-                        <strong>입고 상품 내역</strong>
-                    </div>
+                    <div class="card-header bg-success text-white"><strong>입고 상품 내역</strong></div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover table-bordered mb-0">
