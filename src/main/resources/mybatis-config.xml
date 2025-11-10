@@ -5,10 +5,12 @@
 <configuration>
     <typeAliases>
         <package name="com.ssg.wms.member.domain"/>
-        <package name="com.ssg.wms.outbound.domain"/>
+        <package name="com.ssg.wms.outbound.domain.dto"/>
         <package name="com.ssg.wms.inbound.domain"/>
         <package name="com.ssg.wms.warehouse.domain"/>
         <package name="com.ssg.wms.stock.domain"/>
         <package name="com.ssg.wms.finance.domain"/>
     </typeAliases>
+
+
 </configuration>

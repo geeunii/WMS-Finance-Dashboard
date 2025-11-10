@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssg.wms.mappers.DispatchMapper">
+
+
+
+
+    <select id="getDispatchNameList">
+        select dispatch_id,carID, Cartype, driverName, assignedDate, loadedBOX
+        from dispatch
+        where driverName = #{driverName}
+
+        <if test="criteria != null">
+            ORDER BY assignedDate DESC
+            LIMIT #{criteria.amount} OFFSET #{criteria.skip}
+        </if>
+    </select>
+
+
+
+
+
+    <select id="getDispatchDetailById">
+        select dispatch_ID, approvedOrder_ID, carID, Cartype, driverName, assignedDate, dispatchStatus, loadedBOX, maximumBOX
+        from dispatch
+        where dispatch_ID = #{dispatchId};
+    </select>
+
+
+
+
+
+<!--    배차 정보 등록-->
+    <insert id="insertDispatchInformation" useGeneratedKeys="true" keyProperty="outboundOrderDTO.dispatchId">
+        INSERT INTO dispatch (
+        approvedOrderID,
+        carID,
+        CarType,
+        driverName,
+        assignedDate,
+        dispatchStatus,
+        loadedBOX,
+        maximumBOX
+        ) VALUES (
+        #{outboundOrderDTO.approvedOrderID},
+        #{outboundOrderDTO.carID},
+        #{outboundOrderDTO.carType},
+        #{outboundOrderDTO.driverName},
+        NOW(),
+        #{outboundOrderDTO.dispatchStatus},
+        100,
+        #{outboundOrderDTO.maximumBOX}
+        )
+    </insert>
+
+
+<!--    // 배차 정보 수정-->
+    <update id="updateDispatchInformation">
+        UPDATE dispatch
+        SET
+        carID = #{outboundOrderDTO.carID},
+        Cartype = #{outboundOrderDTO.Cartype},
+        driverName = #{outboundOrderDTO.driverName},
+        WHERE
+        approvedOrderID = #{outboundOrderDTO.approvedOrderID}
+    </update>
+
+
+
+
+<!--    // 운송장 번호 등록-->
+    <!--    등록완료 PENDING, ASSIGNED등등 으로 바꾸가-->
+    <insert id="insertMinimalWaybill">
+        INSERT INTO waybill (
+        dispatch_id,
+        waybill_number,
+        waybill_date,
+        waybill_Status
+        ) VALUES (
+        #{dispatchId},
+        #{waybillNumber},
+        NOW(),
+        '등록완료'  )
+    </insert>
+
+
+
+
+
+</mapper>
