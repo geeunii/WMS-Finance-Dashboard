@@ -5,9 +5,10 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Getter
+@Data
 @ToString
 public class InboundDTO {
     // 출력용 DTO
@@ -16,6 +17,7 @@ public class InboundDTO {
     private int warehouseId;
     private String warehouseName;
     private Long memberId;
+    private Long partnerId;
     private String memberName;
     private int staffId;
     private String staffName;
@@ -25,7 +27,7 @@ public class InboundDTO {
     private LocalDateTime inboundUpdatedAt;
     private LocalDateTime inboundAt;
 
-    private List<InboundItemDTO> inboundItems;
+    private List<InboundItemDTO> inboundItems= new ArrayList<>();
 
 }
 

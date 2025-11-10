@@ -3,6 +3,7 @@ package com.ssg.wms.inbound.service;
 import com.ssg.wms.inbound.domain.InboundItemVO;
 import com.ssg.wms.inbound.domain.InboundVO;
 import com.ssg.wms.inbound.dto.InboundDTO;
+import com.ssg.wms.inbound.dto.InboundListDTO;
 import com.ssg.wms.inbound.dto.InboundRequestDTO;
 import com.ssg.wms.inbound.dto.InboundRequestItemDTO;
 import com.ssg.wms.inbound.mappers.InboundMemberMapper;
@@ -78,6 +79,11 @@ public class InboundMemberServiceImpl implements InboundMemberService {
     @Override
     public InboundDTO getInboundById(int inboundId) {
         return inboundMemberMapper.selectInboundWithItems(inboundId);
+    }
+
+    @Override
+    public List<InboundListDTO> getInboundListByPartner(Long memberId, String status){
+        return inboundMemberMapper.selectInboundListByPartner(memberId, status);
     }
 
 }

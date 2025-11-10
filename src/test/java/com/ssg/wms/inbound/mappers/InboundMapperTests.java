@@ -2,6 +2,7 @@ package com.ssg.wms.inbound.mappers;
 
 import com.ssg.wms.inbound.domain.InboundItemVO;
 import com.ssg.wms.inbound.domain.InboundVO;
+import com.ssg.wms.inbound.dto.InboundListDTO;
 import com.ssg.wms.product_ehs.mappers.ProductMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +48,7 @@ public class InboundMapperTests {
                         .build()
         );
         InboundVO inboundVO = InboundVO.builder()
-                .memberId(1)
+                .memberId(1L)
 //                .inboundStatus("request")
                 .inboundItems(inboundItems)
 //                .inboundRequestedAt(LocalDateTime.now())
@@ -65,6 +66,20 @@ public class InboundMapperTests {
         System.out.println("입고 요청 테스트 완료, inboundId = " + inboundVO.getInboundId());
 
 
+    }
+
+    @Test
+    public void testInboundList() {
+
+        List<InboundListDTO> result = inboundMemberMapper.selectInboundListByPartner(1L, "");
+        System.out.println("조회 건수: " + result.size());
+
+        for (InboundListDTO dto : result) {
+            System.out.println("ID: " + dto.getInboundId() +
+                    ", 요청일시: " + dto.getInboundRequestedAt() +
+                    ", 회원명: " + dto.getMemberName() +
+                    ", 상태: " + dto.getInboundStatus());
+        }
     }
 
 
