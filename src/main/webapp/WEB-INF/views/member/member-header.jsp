@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <html
         lang="en"
         class="light-style layout-menu-fixed"
@@ -19,7 +19,7 @@
     <meta name="description" content="" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="${pageContext.request.contextPath}/resources/img/favicon/favicon.ico" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -30,26 +30,26 @@
     />
 
     <!-- Icons. Uncomment required icon fonts -->
-    <link rel="stylesheet" href="assets/vendor/fonts/boxicons.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/vendor/fonts/boxicons.css" />
 
     <!-- Core CSS -->
-    <link rel="stylesheet" href="assets/vendor/css/core.css" class="template-customizer-core-css" />
-    <link rel="stylesheet" href="assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
-    <link rel="stylesheet" href="assets/css/demo.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/vendor/css/core.css" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/demo.css" />
 
     <!-- Vendors CSS -->
-    <link rel="stylesheet" href="assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
 
-    <link rel="stylesheet" href="assets/vendor/libs/apex-charts/apex-charts.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/vendor/libs/apex-charts/apex-charts.css" />
 
     <!-- Page CSS -->
 
     <!-- Helpers -->
-    <script src="assets/vendor/js/helpers.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/vendor/js/helpers.js"></script>
 
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-    <script src="assets/js/config.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/config.js"></script>
 </head>
 
 <body>
@@ -145,28 +145,42 @@
 
                 <!-- Admin Menu -->
                 <li class="menu-header small text-uppercase">
-                    <span class="menu-header-text">Manager Menu</span>
+                    <span class="menu-header-text">Member Menu</span>
                 </li>
 
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                        <div data-i18n="Basic">재고 관리</div>
+                        <div data-i18n="Basic">입고 요청</div>
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
                             <a href="html/pages-account-settings-account.html" class="menu-link">
-                                <div data-i18n="Account">재고 조회</div>
+                                <div data-i18n="Account">요청 작성</div>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="html/pages-account-settings-account.html" class="menu-link">
-                                <div data-i18n="Account">재고 실사</div>
+                                <div data-i18n="Account">요청 조회/수정/취소</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="menu-item">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <i class="menu-icon tf-icons bx bx-dock-top"></i>
+                        <div data-i18n="Basic">출고 요청</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li class="menu-item">
+                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                                <div data-i18n="Account">요청 작성</div>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="html/pages-account-settings-account.html" class="menu-link">
-                                <div data-i18n="Account">품목 현황</div>
+                                <div data-i18n="Account">요청 조회/수정/취소</div>
                             </a>
                         </li>
                     </ul>
@@ -180,12 +194,7 @@
                     <ul class="menu-sub">
                         <li class="menu-item">
                             <a href="html/pages-account-settings-account.html" class="menu-link">
-                                <div data-i18n="Account">창고 등록</div>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
-                                <div data-i18n="Account">창고 목록 조회/수정</div>
+                                <div data-i18n="Account">창고 목록 조회</div>
                             </a>
                         </li>
                         <li class="menu-item">
@@ -247,7 +256,7 @@
                         <li class="nav-item navbar-dropdown dropdown-user dropdown">
                             <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                                 <div class="avatar avatar-online">
-                                    <img src="assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                                    <img src="${pageContext.request.contextPath}/resources/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
                                 </div>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
@@ -256,7 +265,7 @@
                                         <div class="d-flex">
                                             <div class="flex-shrink-0 me-3">
                                                 <div class="avatar avatar-online">
-                                                    <img src="assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                                                    <img src="${pageContext.request.contextPath}/resources/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1">

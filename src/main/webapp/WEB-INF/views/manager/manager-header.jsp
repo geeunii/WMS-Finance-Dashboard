@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <html
         lang="en"
         class="light-style layout-menu-fixed"
@@ -145,42 +145,28 @@
 
                 <!-- Admin Menu -->
                 <li class="menu-header small text-uppercase">
-                    <span class="menu-header-text">Member Menu</span>
+                    <span class="menu-header-text">Manager Menu</span>
                 </li>
 
                 <li class="menu-item">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                        <div data-i18n="Basic">입고 요청</div>
+                        <div data-i18n="Basic">재고 관리</div>
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
                             <a href="html/pages-account-settings-account.html" class="menu-link">
-                                <div data-i18n="Account">요청 작성</div>
+                                <div data-i18n="Account">재고 조회</div>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="html/pages-account-settings-account.html" class="menu-link">
-                                <div data-i18n="Account">요청 조회/수정/취소</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="menu-item">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                        <div data-i18n="Basic">출고 요청</div>
-                    </a>
-                    <ul class="menu-sub">
-                        <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
-                                <div data-i18n="Account">요청 작성</div>
+                                <div data-i18n="Account">재고 실사</div>
                             </a>
                         </li>
                         <li class="menu-item">
                             <a href="html/pages-account-settings-account.html" class="menu-link">
-                                <div data-i18n="Account">요청 조회/수정/취소</div>
+                                <div data-i18n="Account">품목 현황</div>
                             </a>
                         </li>
                     </ul>
@@ -194,7 +180,12 @@
                     <ul class="menu-sub">
                         <li class="menu-item">
                             <a href="html/pages-account-settings-account.html" class="menu-link">
-                                <div data-i18n="Account">창고 목록 조회</div>
+                                <div data-i18n="Account">창고 등록</div>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                                <div data-i18n="Account">창고 목록 조회/수정</div>
                             </a>
                         </li>
                         <li class="menu-item">
