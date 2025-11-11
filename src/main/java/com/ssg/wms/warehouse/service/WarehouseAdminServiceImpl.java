@@ -74,7 +74,7 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
 
             for (SectionDTO section : saveDTO.getSections()) {
 
-                // ✨ 5-1. 층수 제약 조건 (최대 2층) 검증 ✨
+               
                 if (section.getLocations() != null) {
                     for (LocationDTO location : section.getLocations()) {
                         if (location.getFloorNum() > 3) {
