@@ -6,6 +6,7 @@ import com.ssg.wms.inbound.dto.InboundRequestDTO;
 import com.ssg.wms.product_ehs.dto.CategoryDTO;
 import com.ssg.wms.product_ehs.dto.ProductDTO;
 import com.ssg.wms.inbound.service.InboundMemberService;
+import com.ssg.wms.product_ehs.service.ProductService;
 import com.ssg.wms.product_ehs.service.ProductServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,7 +28,7 @@ import java.util.List;
 public class InboundMemberController {
 
     private final InboundMemberService inboundMemberService;
-    private final ProductServiceImpl productService;
+    private final ProductService productService;
 
     // 관리자가 승인시에 창고 위치 지정할때 창고 리스트 보려고 사용
 //    private final WarehouseService warehouseService
@@ -58,10 +59,6 @@ public class InboundMemberController {
         model.addAttribute("categories", categories);
         log.info(categories);
 
-        // 입고요청시에 볼 상품 리스트 데이터 로드
-        List<ProductDTO> products = new ArrayList<>();
-        model.addAttribute("products", products);
-
         return "inbound/member/request";
     }
 
@@ -84,7 +81,7 @@ public class InboundMemberController {
                                  @Valid @ModelAttribute InboundRequestDTO inboundRequestDTO) {
 
         // 로그인한 사용자의 memberId 가져오기
-        Long memberId = 1L;  // Integer → Long으로 변경!
+        Long memberId = 1L;
 //        Long memberId = (Long) session.getAttribute("loginMemberId");
         inboundRequestDTO.setMemberId(memberId);
 
@@ -115,6 +112,7 @@ public class InboundMemberController {
     // 입고 요청 단건 조회
     @GetMapping("/{inboundId}")
     public ResponseEntity<InboundDTO> getInboundById(@PathVariable int inboundId,
+                                                     Model model,
                                                      HttpSession session) {
         InboundDTO inboundDTO = inboundMemberService.getInboundById(inboundId);
 
@@ -128,15 +126,15 @@ public class InboundMemberController {
         }
 
 
-        Long userPartnerId = 1L;
+        Long partnerId = 1L;
         // 세션에서 로그인 사용자의 거래처 정보 가져오기
-//        Long userPartnerId = (Long) session.getAttribute("partnerId");
-        if (userPartnerId == null) {
+//        Long partnerId = (Long) session.getAttribute("partnerId");
+        if (partnerId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         // 거래처 권한 체크
-        if (inboundDTO.getPartnerId() == null || !inboundDTO.getPartnerId().equals(userPartnerId)) {
+        if (inboundDTO.getPartnerId() == null || !inboundDTO.getPartnerId().equals(partnerId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -144,6 +142,18 @@ public class InboundMemberController {
     }
 
     // 입고 요청 수정
+    @PutMapping("/{inboundId}")
+    public ResponseEntity<InboundDTO> editInboundRequest(
+            @PathVariable int inboundId,
+            @RequestBody InboundRequestDTO inboundRequestDTO) {
+
+        inboundRequestDTO.setInboundId(inboundId);
+
+        // 서비스에서 수정 후 최신 데이터 반환
+        InboundDTO updatedDto = inboundMemberService.updateInbound(inboundRequestDTO);
+
+        return ResponseEntity.ok(updatedDto);
+    }
 
     // 입고 요청 취소
 

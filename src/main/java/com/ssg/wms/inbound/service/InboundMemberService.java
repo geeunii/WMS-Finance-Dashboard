@@ -18,4 +18,7 @@ public interface InboundMemberService {
     InboundDTO getInboundById(int inboundId);
 
     List<InboundListDTO> getInboundListByPartner(Long memberId, String inboundStatus);
+
+    @Transactional
+    InboundDTO updateInbound(InboundRequestDTO inboundRequestDTO);
 }

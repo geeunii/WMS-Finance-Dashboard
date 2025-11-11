@@ -35,9 +35,9 @@ public class InboundMemberServiceImpl implements InboundMemberService {
         log.info("=== Service 진입 ===");
         log.info("받은 DTO memberId: {}", inboundRequestDTO.getMemberId());
 
-        // InboundVO 생성 시 memberId 포함!
+        // InboundVO 생성 시 memberId 포함
         InboundVO inboundVO = InboundVO.builder()
-                .memberId(inboundRequestDTO.getMemberId())  // ⭐ 추가!
+                .memberId(inboundRequestDTO.getMemberId())
                 .inboundStatus("request")
                 .build();
 
@@ -84,6 +84,25 @@ public class InboundMemberServiceImpl implements InboundMemberService {
     @Override
     public List<InboundListDTO> getInboundListByPartner(Long memberId, String status){
         return inboundMemberMapper.selectInboundListByPartner(memberId, status);
+    }
+
+    @Transactional
+    @Override
+    public InboundDTO updateInbound(InboundRequestDTO inboundRequestDTO) {
+        // 1 기본 정보 업데이트
+        inboundMemberMapper.updateInbound(inboundRequestDTO);
+
+        // 2 기존 상품 삭제
+        inboundMemberMapper.deleteInboundItems(inboundRequestDTO.getInboundId());
+
+        // 3 새로운 상품 목록 등록
+        if (inboundRequestDTO.getInboundRequestItems() != null &&
+                !inboundRequestDTO.getInboundRequestItems().isEmpty()) {
+            inboundMemberMapper.insertInboundItemsBatch(inboundRequestDTO.getInboundRequestItems());
+        }
+
+        // 4 최신 데이터 조회 후 출력용 DTO 반환
+        return inboundMemberMapper.selectInboundWithItems(inboundRequestDTO.getInboundId());
     }
 
 }

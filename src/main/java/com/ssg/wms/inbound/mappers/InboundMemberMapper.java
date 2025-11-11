@@ -4,6 +4,8 @@ import com.ssg.wms.inbound.domain.InboundItemVO;
 import com.ssg.wms.inbound.domain.InboundVO;
 import com.ssg.wms.inbound.dto.InboundDTO;
 import com.ssg.wms.inbound.dto.InboundListDTO;
+import com.ssg.wms.inbound.dto.InboundRequestDTO;
+import com.ssg.wms.inbound.dto.InboundRequestItemDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,6 +25,12 @@ public interface InboundMemberMapper {
     InboundDTO selectInboundWithItems(int inboundId);
 
     // 입고 요청 수정
+    // 입고 기본 정보 수정
+    void updateInbound(InboundRequestDTO dto);
+    // 기존 상품 삭제
+    void deleteInboundItems(int inboundId);
+    // 상품 목록 batch insert
+    void insertInboundItemsBatch(List<InboundRequestItemDTO> items);
 
     // 입고 요청 취소
 

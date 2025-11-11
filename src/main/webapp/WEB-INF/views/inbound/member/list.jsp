@@ -29,7 +29,7 @@
         </thead>
         <tbody id="inboundTableBody">
         <c:forEach var="item" items="${list}">
-            <tr style="cursor:pointer;">
+            <tr style="cursor:pointer" data-inbound-id="${item.inboundId}">
                 <td>${item.inboundId}</td>
                 <td>${item.partnerName}</td>
                 <td>${item.memberName}</td>
@@ -56,7 +56,6 @@
 
 <script>
     $(document).ready(function() {
-        // 모달 초기화
         const inboundModalElement = document.getElementById('inboundModal');
         const inboundModal = new bootstrap.Modal(inboundModalElement);
 
@@ -64,7 +63,7 @@
         $("#statusFilter").change(function() {
             const status = $(this).val();
             $.ajax({
-                url: "<%=contextPath%>/inbound/member/list",
+                url: "/inbound/member/list",
                 type: "get",
                 data: { status: status },
                 success: function(data) {
@@ -79,84 +78,114 @@
 
         // 테이블 행 클릭 시 상세 모달 띄우기
         $(document).on('click', '#inboundTableBody tr', function() {
-            const inboundId = $(this).find('td:first').text().trim();
-            openInboundModal(inboundId);
+            const inboundId = $(this).data('inbound-id');
+            console.log('선택한 inboundId:', inboundId);
+            if (inboundId) openInboundModal(inboundId);
         });
 
-        // 날짜 포맷팅 함수
+        // 날짜 포맷 함수
         function formatDate(dateInput) {
-            if (!dateInput) return '';
-            if (typeof dateInput === 'string') {
-                return dateInput.length >= 16 ? dateInput.substring(0,16).replace('T',' ') : dateInput;
-            }
-            if (dateInput instanceof Date) {
-                return dateInput.toISOString().substring(0,16).replace('T',' ');
-            }
+            if(!dateInput) return '';
+            if(typeof dateInput === 'string') return dateInput.substring(0,16).replace('T',' ');
+            if(dateInput instanceof Date) return dateInput.toISOString().substring(0,16).replace('T',' ');
             return String(dateInput);
         }
 
-        // 입고 상품 렌더링
-        function renderInboundItems(items) {
-            const tbody = document.getElementById('inboundItemsBody');
-            tbody.innerHTML = '';
+        // 상품 행 추가
+        function addInboundItemRow(item) {
+            const template = document.getElementById('inboundItemTemplate');
+            if (!template) {
+                console.error('템플릿을 찾을 수 없습니다.');
+                return;
+            }
 
-            if (items && items.length > 0) {
-                items.forEach(item => {
-                    // DTO 구조에 따라 item 객체의 속성에 직접 접근합니다.
-                    const row = `
-                        <tr>
-                            <td>\${item.productId || ''}</td>
-                            <td>\${item.categoryName || '미분류'}</td>
-                            <td>\${item.productName || ''}</td>
-                            <td class="text-end">\${item.quantity ? item.quantity.toLocaleString() : '0'}</td>
-                        </tr>`;
-                    tbody.insertAdjacentHTML('beforeend', row);
+            const clone = template.cloneNode(true);
+            clone.removeAttribute('id');
+            clone.style.display = '';
+
+            // INDEX 대체 (form submit 용)
+            const uniqueIndex = Date.now() + Math.floor(Math.random() * 1000);
+            clone.innerHTML = clone.innerHTML.replaceAll('INDEX', uniqueIndex);
+
+            document.getElementById('inboundItemsBody').appendChild(clone);
+
+            const productSelect = clone.querySelector('.productSelect');
+            const categorySelect = clone.querySelector('.categorySelect');
+            const quantityInput = clone.querySelector('.quantity');
+            const removeBtn = clone.querySelector('.removeItemBtn');
+
+            // DB 값 존재 시 매핑
+            if(item){
+                if(categorySelect && item.categoryCd != null){
+                    categorySelect.value = String(item.categoryCd);
+                }
+
+                if(productSelect && item.productId){
+                    productSelect.value = item.productId;
+
+                    // 상품 선택 후 카테고리 재설정
+                    const selectedOption = productSelect.selectedOptions[0];
+                    if(selectedOption && categorySelect){
+                        const cat = selectedOption.dataset.category;
+                        if(cat) categorySelect.value = String(cat);
+                    }
+                }
+
+                if(quantityInput){
+                    quantityInput.value = item.quantity || 1;
+                }
+            }
+
+
+            // 상품 변경 시 카테고리 자동 설정
+            if(productSelect && categorySelect){
+                productSelect.addEventListener('change', () => {
+                    const selected = productSelect.selectedOptions[0];
+                    if(selected){
+                        categorySelect.value = selected.dataset.category || '';
+                    }
                 });
-            } else {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="text-center text-muted py-3">
-                            입고 상품이 없습니다.
-                        </td>
-                    </tr>`;
+            }
+
+            // 삭제 버튼
+            if(removeBtn){
+                removeBtn.addEventListener('click', () => clone.remove());
             }
         }
 
-        // 입고 상세 모달 열기
-        function openInboundModal(inboundId) {
-            axios.get("<%=contextPath%>/inbound/member/" + inboundId)
-                .then(function(response) {
+        // 상품 목록 렌더링
+        function renderInboundItems(items){
+            const tbody = document.getElementById('inboundItemsBody');
+            tbody.innerHTML = '';
+
+            if(items && items.length > 0){
+                items.forEach(item => addInboundItemRow(item));
+            }
+        }
+
+        // 모달 열기
+        function openInboundModal(inboundId){
+            axios.get('<%=contextPath%>/inbound/member/' + inboundId)
+                    .then(response => {
                     const data = response.data;
-
-
-                    console.log('--- Axios 응답 전체 데이터 ---');
-                    console.log(data);
-                    console.log('--- 렌더링에 전달될 아이템 배열 ---');
-                    console.log(data.inboundItems);
-
-
-
-                    if (!data) {
+                    if(!data){
                         alert('데이터를 불러올 수 없습니다.');
                         return;
                     }
 
-                    // 기본 정보 세팅
+                    // 기본 정보
                     document.getElementById('inboundId').value = data.inboundId || '';
-                    // document.getElementById('inboundStatus').value = data.inboundStatus || '';
                     document.getElementById('inboundStatus').value = data.inboundStatusKor || '';
-                    document.getElementById('warehouseName').value = data.warehouseName || '';
+                    document.getElementById('warehouseName').value = data.warehouseName || '미지정';
                     document.getElementById('partnerName').value = data.partnerName || '';
                     document.getElementById('memberName').value = data.memberName || '';
                     document.getElementById('staffName').value = data.staffName || '미지정';
-
-                    // 날짜 포맷팅
                     document.getElementById('inboundRequestedAt').value = formatDate(data.inboundRequestedAt);
-                    document.getElementById('inboundAt').value = formatDate(data.inboundAt);
+                    document.getElementById('inboundAt').value = formatDate(data.inboundAt) || '미지정';
 
-                    // 반려 사유 처리
+                    // 반려 사유
                     const rejectSection = document.getElementById('rejectReasonSection');
-                    if (data.inboundStatus === 'rejected' && data.inboundRejectReason) {
+                    if(data.inboundStatus === 'rejected' && data.inboundRejectReason){
                         document.getElementById('inboundRejectReason').value = data.inboundRejectReason;
                         rejectSection.style.display = 'block';
                     } else {
@@ -166,18 +195,22 @@
                     // 상품 목록 렌더링
                     renderInboundItems(data.inboundItems);
 
-                    // 모달 표시
                     inboundModal.show();
                 })
-                .catch(function(error) {
-                    console.error('입고 상세 조회 오류:', error);
+                .catch(err => {
+                    console.error('입고 상세 조회 오류:', err);
                     alert('입고 상세 조회 중 오류가 발생했습니다.');
                 });
         }
 
-        // 전역 함수로 노출
+        // 상품 추가 버튼
+        document.getElementById('addInboundItemBtn').addEventListener('click', () => addInboundItemRow(null));
+
+        // 전역 노출
         window.openInboundModal = openInboundModal;
     });
 </script>
+
+
 
 <%@ include file="../../member/member-footer.jsp" %>

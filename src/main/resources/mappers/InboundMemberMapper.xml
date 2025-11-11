@@ -17,6 +17,8 @@
             <id property="inboundItemId" column="inbound_item_id"/>
             <result property="productId" column="product_id"/>
             <result property="productName" column="product_name"/>
+            <result property="categoryCd" column="category_cd"/>
+            <result property="categoryName" column="category_name"/>
             <result property="quantity" column="quantity"/>
         </collection>
     </resultMap>
@@ -78,6 +80,7 @@
         ii.inbound_item_id,
         ii.product_id,
         p.product_name,
+        c.category_cd,
         c.category_name,
         ii.quantity,
         i.inbound_requested_at,
@@ -95,6 +98,39 @@
     </select>
 
     <!-- 입고 요청 수정 -->
+    <!-- 입고 기본 정보 수정 -->
+    <update id="updateInbound" parameterType="com.ssg.wms.inbound.dto.InboundRequestDTO">
+        UPDATE inbound
+        SET
+        warehouse_id = #{warehouseId},
+        staff_id = #{staffId},
+        member_id = #{memberId},
+        inbound_status = #{inboundStatus},
+        inbound_reject_reason = #{inboundRejectReason},
+        inbound_updated_at = NOW()
+        WHERE inbound_id = #{inboundId}
+    </update>
+
+    <!-- 기존 상품 삭제 -->
+    <delete id="deleteInboundItems" parameterType="int">
+        DELETE FROM inbound_item
+        WHERE inbound_id = #{inboundId}
+    </delete>
+
+<!--    &lt;!&ndash; 새로운 상품 목록 insert &ndash;&gt;-->
+<!--    <insert id="insertInboundItem" parameterType="com.ssg.wms.inbound.dto.InboundRequestItemDTO">-->
+<!--        INSERT INTO inbound_item (inbound_id, product_id, quantity)-->
+<!--        VALUES (#{inboundId}, #{productId}, #{quantity})-->
+<!--    </insert>-->
+
+    <!-- 여러 상품을 foreach로 batch insert -->
+    <insert id="insertInboundItemsBatch" parameterType="java.util.List">
+        INSERT INTO inbound_item (inbound_id, product_id, quantity)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.inboundId}, #{item.productId}, #{item.quantity})
+        </foreach>
+    </insert>
 
     <!-- 입고 요청 취소 -->
 
