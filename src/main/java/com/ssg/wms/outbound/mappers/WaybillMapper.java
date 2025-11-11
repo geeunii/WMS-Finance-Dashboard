@@ -2,6 +2,7 @@ package com.ssg.wms.outbound.mappers;
 
 
 import com.ssg.wms.outbound.domain.Criteria;
+import com.ssg.wms.outbound.domain.dto.OutboundOrderDTO;
 import com.ssg.wms.outbound.domain.dto.WaybillDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -18,7 +19,10 @@ public interface WaybillMapper {
     List<WaybillDTO> getWaybills(@Param("criteria") Criteria criteria, @Param("search") String search);
 
     //  운송장 정보입력
-    void insertWaybill(@Param("waybillDTO") WaybillDTO waybillDTO);
+    void insertWaybill(OutboundOrderDTO outboundOrderDTO);
+
+    // UPDATE 쿼리 호출을 위한 메서드 추가
+    void updateWaybill(WaybillDTO dto);
 
     //QR코드용 조회
     WaybillDTO getWaybillByNumber(@Param("waybillNumber") String waybillNumber);

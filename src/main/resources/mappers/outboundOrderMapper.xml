@@ -75,7 +75,7 @@
     </select>
 
     <!-- 필터링된 출고오더 조회 -->
-    <select id="getFilteredOrders" resultType="OutboundOrderDTO">
+    <select id="getFilteredOrders" resultType="com.ssg.wms.outbound.domain.dto.OutboundOrderDTO">
         SELECT
         so.approvedOrder_ID,
         sr.outboundRequest_ID,
@@ -131,13 +131,16 @@
         WHERE so.approvedOrder_ID = #{approvedOrder_ID}
     </select>
 
+
+
     <!-- 출고오더 상태 수정 -->
     <update id="updateOrderStatus">
         UPDATE outboundOrder
         SET
         orderStatus = #{outboundOrderDTO.orderStatus},
         approvedDate = NOW()
-        WHERE approvedOrderID = #{outboundOrderDTO.approvedOrderID}
+        WHERE approvedOrder_ID = #{outboundOrderDTO.approvedOrderID}
     </update>
+
 
 </mapper>

@@ -1,14 +1,15 @@
 package com.ssg.wms.outbound.controller;
 
+import com.ssg.wms.common.Role;
 import com.ssg.wms.outbound.domain.Criteria;
 import com.ssg.wms.outbound.domain.dto.OutboundOrderDTO;
 import com.ssg.wms.outbound.service.OutboundOrderService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @RestController
@@ -20,53 +21,61 @@ public class outboundOrderController {
     private final OutboundOrderService outboundOrderService;
 
 
+    /**
+     * ✅ 관리자 권한 체크 공통 메서드
+     */
+    private boolean isAdmin(HttpSession session) {
+        Object role = session.getAttribute("role");
+        return role != null && role.equals(Role.ADMIN);
+    }
 
-
-    // 출고지시서 조건 조회(상태별로, 승인자별로 등등)
-    //(required = false)로 설정되어 있어 값이 없을 때는 전체 조회, 값이 있을 때는 조건 조회
+    // 1️⃣ 출고지시서 조건 조회 + 전체 조회
     @GetMapping
-    public ResponseEntity<List<OutboundOrderDTO>>getOutboundInstructionList(Criteria criteria,
-                                                                            @RequestParam(required = false) String filterType){
-        log.info("출고지시서 목록 조회 요청 - filterType: {}", filterType);
+    public ResponseEntity<List<OutboundOrderDTO>> getOutboundInstructionList(
+            HttpSession session,
+            Criteria criteria,
+            @RequestParam(required = false) String filterType) {
 
-        // search 값이 null이면 전체 조회, 값이 있으면 조건 조회로 Service에서 처리해야 합니다.
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(403).build(); // 관리자만 접근 가능
+        }
+
+        log.info("출고지시서 목록 조회 요청 - filterType: {}", filterType);
         List<OutboundOrderDTO> instructionList = outboundOrderService.getAllRequests(criteria, filterType);
         return ResponseEntity.ok(instructionList);
     }
 
-
-
-
-    // 출고지시서 상세 조회 (GET /admin/instructions/{instructionId})
+    // 2️⃣ 출고지시서 상세 조회
     @GetMapping("/{instructionId}")
     public ResponseEntity<OutboundOrderDTO> getOutboundInstructionDetail(
-            @PathVariable("instructionId") Long approvedOrderId) { // PathVariable 이름과 메서드 파라미터 이름이 다를 경우 명시
+            @PathVariable("instructionId") Long approvedOrderId,
+            HttpSession session) {
 
-        log.info("출고지시서 상세 조회 요청 - Instruction ID: {}", approvedOrderId);
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(403).build();
+        }
 
-        // Service를 호출하여 특정 지시서 상세 정보를 가져옵니다.
+        log.info("출고지시서 상세 조회 요청 - ID: {}", approvedOrderId);
         OutboundOrderDTO detail = outboundOrderService.getRequestDetailById(approvedOrderId);
 
-        // 데이터가 없을 경우 404 Not Found를 처리하는 로직을 Service에서 구현하는 것이 일반적입니다.
         return ResponseEntity.ok(detail);
     }
 
-
-
-    // 출고지시서 상태 변경 (PATCH /admin/instructions/{instructionId}/status)
-    @PatchMapping("/{instructionId}/status")
+    // 3️⃣ 출고지시서 상태 변경
+    @PostMapping("/{instructionId}/status")
     public ResponseEntity<Void> updateInstructionStatus(
             @PathVariable("instructionId") Long approvedOrderId,
-            @RequestBody OutboundOrderDTO outboundOrderDTO) {
+            @RequestBody OutboundOrderDTO outboundOrderDTO,
+            HttpSession session) {
 
-        log.info("출고지시서 상태 변경 요청 - ID: {}, 새 상태: {}", approvedOrderId, outboundOrderDTO.getApprovedStatus());
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(403).build();
+        }
 
-        // Service를 호출하여 상태 변경 로직을 처리합니다.
-        // updateDTO에는 변경할 상태 정보(예: '승인' 또는 '반려')가 담겨 있습니다.
+        outboundOrderDTO.setApprovedOrderID(approvedOrderId);
+        log.info("출고지시서 상태 변경 요청 - ID: {}, 상태: {}", approvedOrderId, outboundOrderDTO.getApprovedStatus());
+
         outboundOrderService.updateOrderStatus(outboundOrderDTO);
-
-        // 200 OK 응답 (Body 없음)
         return ResponseEntity.ok().build();
     }
-
 }

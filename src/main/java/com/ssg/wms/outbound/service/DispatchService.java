@@ -22,7 +22,7 @@ public interface DispatchService {
     // 배차 정보 등록
     void insertDispatchInformation(OutboundOrderDTO outboundOrderDTO);
     // 배차 수정
-    void updateDispatchInformation(OutboundOrderDTO outboundOrderDTO);
+    void updateDispatchInformation(DispatchDTO dispatchDTO);
 
     // 운송장 번호 등록
     void insertMinimalWaybill(OutboundOrderDTO outboundOrderDTO);

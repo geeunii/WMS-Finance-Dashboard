@@ -6,7 +6,7 @@
 <mapper namespace="com.ssg.wms.outbound.mappers.OutboundItemMapper">
 
     <!-- ✅ 출고품목 추가 -->
-    <insert id="insertOutboundItem" parameterType="OutboundItemDTO">
+    <insert id="insertOutboundItem" parameterType="com.ssg.wms.outbound.domain.dto.OutboundItemDTO">
         INSERT INTO outboundItem (
         outboundRequest_ID,
         Product_ID,

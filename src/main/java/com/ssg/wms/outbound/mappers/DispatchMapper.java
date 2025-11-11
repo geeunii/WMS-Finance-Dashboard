@@ -21,13 +21,20 @@ public interface DispatchMapper {
 
 
     //배차 정보 등록
-    void insertDispatchInformation(@Param("outboundOrderDTO") OutboundOrderDTO outboundOrderDTO);
+    void insertDispatchInformation(OutboundOrderDTO outboundOrderDTO);
 
     // 배차 정보 수정
-    void updateDispatchInformation(@Param("outboundOrderDTO") OutboundOrderDTO outboundOrderDTO);
+    void updateDispatchInformation(DispatchDTO dispatchDTO);
 
     // 운송장 번호 등록
-    void insertMinimalWaybill(@Param("dispatchId") int dispatchId,
+    void insertMinimalWaybill(@Param("dispatchId") Long dispatchId,
                               @Param("waybillNumber") String waybillNumber);
 
+
+// 해당 approvedOrder_ID에 매핑되는 dispatchID를 조회
+    Long getDispatchIdByApprovedOrderId(@Param("approvedOrderId") Long approvedOrderId);
+
+    // 적재 박스 개수만 업데이트하는 메서드 추가
+    void updateLoadedBox(@Param("dispatchId") Long dispatchId,
+                         @Param("loadedBox") Integer loadedBox);
 }

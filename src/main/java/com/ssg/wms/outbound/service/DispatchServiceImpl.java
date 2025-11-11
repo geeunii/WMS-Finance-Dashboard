@@ -44,7 +44,7 @@ public class DispatchServiceImpl implements DispatchService {
         log.info("배차 정보 등록 요청: 지시서 ID={}", outboundOrderDTO.getApprovedOrderID());
 
         int loadedBox = outboundOrderDTO.getLoadedBox();
-        int maximumBox = outboundOrderDTO.getMaximumBox();
+        int maximumBox = outboundOrderDTO.getMaximumBOX();
 
         if(loadedBox > maximumBox) {
             log.warn("배차 등록 실패: 적재량이 최대 적재량을 초과했습니다. 적재량={}, 최대={}", loadedBox, maximumBox);
@@ -60,9 +60,9 @@ public class DispatchServiceImpl implements DispatchService {
     // 배차 정보 수정
     @Transactional
     @Override
-    public void updateDispatchInformation(OutboundOrderDTO outboundOrderDTO) {
-        log.info("배차 정보 수정 요청: 지시서 ID={}", outboundOrderDTO.getApprovedOrderID());
-        dispatchMapper.updateDispatchInformation(outboundOrderDTO);
+    public void updateDispatchInformation(DispatchDTO dispatchDTO) {
+        log.info("배차 정보 수정 요청: 지시서 ID={}", dispatchDTO.getDispatchId());
+        dispatchMapper.updateDispatchInformation(dispatchDTO);
     }
 
 
@@ -74,11 +74,10 @@ public class DispatchServiceImpl implements DispatchService {
         log.info("운송장 번호 등록 요청: 지시서 ID={}", outboundOrderDTO.getApprovedOrderID());
 
         // 1. DTO에서 dispatchId를 안전하게 획득
-        // * 이전 insertDispatchInformation 호출을 통해 DTO에 dispatchId가 주입되어 있습니다.
-        int dispatchId = outboundOrderDTO.getDispatchId();
+        // 🚨 int 대신 Long 타입으로 변경합니다.
+        Long dispatchId = outboundOrderDTO.getDispatchId();
 
-        if (dispatchId <= 0) {
-            // dispatchId가 유효하지 않은 경우 (insertDispatchInformation 호출 누락 또는 실패)
+        if (dispatchId == null || dispatchId <= 0) { // null 체크 포함
             throw new IllegalStateException("dispatchId가 유효하지 않습니다. 배차 정보 등록이 선행되어야 합니다.");
         }
 
@@ -87,7 +86,6 @@ public class DispatchServiceImpl implements DispatchService {
 
         // 3. 최소 운송장 정보 등록
         // DAO 파라미터에 맞게 dispatchId와 waybillNumber를 전달합니다.
-        // 이 로직은 배차 등록 트랜잭션의 마지막 단계로 실행됩니다.
         dispatchMapper.insertMinimalWaybill(dispatchId, waybillNumber);
 
         log.info("운송장 번호 {}가 dispatchId {}에 등록 완료되었습니다.", waybillNumber, dispatchId);

@@ -266,7 +266,7 @@ INSERT INTO waybill (waybill_id, waybill_number, waybill_date, waybill_status, d
 
 
 
-
+ALTER TABLE waybill MODIFY waybill_number VARCHAR(50);
 ALTER TABLE outboundRequest MODIFY warehouse_id int NULL;
 ALTER TABLE outboundRequest MODIFY staff_id BIGINT NULL;
 
@@ -393,5 +393,66 @@ GROUP BY
 
 
 
-select
+select * from outboundOrder;
+
+SELECT
+    -- Outbound Order 정보
+    ob.orderStatus AS 요청상태,
+    ob.approvedDate AS 승인일자,
+
+    -- Dispatch 정보 (차량 및 배차)
+    d.dispatch_ID AS 배차ID,
+    d.driverName AS 기사이름,
+    d.Cartype AS 차량종류,
+    d.carID AS 차량번호,
+    d.dispatchStatus AS 배차상태,
+    d.maximumBOX AS 최대적재량,
+
+    -- Waybill 정보 (운송장)
+    w.waybill_number AS 운송장번호,
+    w.waybill_status AS 운송장상태
+
+FROM outboundOrder ob
+-- Dispatch 테이블 연결 (FK: approvedOrder_ID)
+         LEFT JOIN dispatch d ON ob.approvedOrder_ID = d.approvedOrder_ID
+-- Waybill 테이블 연결 (FK: dispatch_ID)
+         LEFT JOIN waybill w ON d.dispatch_ID = w.dispatch_ID
+-- 우리가 업데이트한 ID를 조건으로 사용
+WHERE ob.approvedOrder_ID = 1;
+
+
+
+SELECT driverName, Cartype, dispatchStatus, carID
+FROM dispatch
+WHERE approvedOrder_ID = 1;
+
+
+SELECT dispatch_ID, waybill_number, waybill_status
+FROM waybill
+WHERE dispatch_ID = 3;
+-- 이 쿼리로 'WB-' 번호가 정상적으로 등록되었는지 확인합니다.
+
+
+SELECT
+    -- 1. Waybill 테이블 기본 정보
+    w.waybill_id            AS "운송장아이디",
+    w.waybill_number        AS "운송장고유번호",
+    w.waybill_date          AS "운송장생성일자",
+    w.departure_Address     AS "출발지주소",
+    w.arrival_Address       AS "도착지주소",
+    w.sender_Name           AS "발송인이름",
+    w.receiver_Name         AS "수신자이름",
+
+    -- 2. Dispatch 테이블에서 JOIN된 정보
+    d.driverName            AS "차량기사이름",
+    d.loadedBOX             AS "적재된박스개수"
+
+FROM waybill w
+-- dispatch 테이블과 dispatch_ID를 기준으로 JOIN
+         LEFT JOIN dispatch d ON w.dispatch_ID = d.dispatch_ID
+-- 방금 수정했던 운송장 ID (PK)를 기준으로 필터링
+WHERE w.waybill_id = 11;
+
+
+
 
