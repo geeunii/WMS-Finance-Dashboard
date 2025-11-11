@@ -142,6 +142,7 @@
             },
             dataType: 'json',
             success: function (res) {
+                // [수정] DTO에 salesCode가 포함된 sales 리스트를 사용
                 renderTable(res.sales);
                 renderPagination(res);
             },
@@ -151,21 +152,26 @@
         });
     }
 
+    // --- ▼ [수정] 날짜 포맷팅과 salesCode를 사용하도록 수정한 최종본 ---
     function renderTable(list) {
         let tbody = $('#tableBody').empty();
+
         if (!list || list.length === 0) {
             tbody.append('<tr><td colspan="7" class="text-center py-3">데이터가 없습니다.</td></tr>');
             return;
         }
+
         list.forEach(item => {
+            // 금액 포맷
             let amt = new Intl.NumberFormat('ko-KR').format(item.amount);
 
-            // [수정]
-            // 1. <td>\${item.id}</td> -> <td>\${item.salesCode}</td> 로 변경
-            // 2. onclick="openDetailModal(\${item.id})" 는 그대로 ID를 사용 (모달은 PK로 조회해야 하므로)
+            // 날짜 포맷: "2025,11,10" -> "2025-11-10"
+            let formattedDate = item.salesDate ? String(item.salesDate).replace(/,/g, '-') : '-';
+
+            // DTO의 salesCode 필드를 사용 (Service에서 생성한 값)
             tbody.append(`<tr style="cursor:pointer" onclick="openDetailModal(\${item.id})">
                 <td>\${item.salesCode}</td>
-                <td>\${item.salesDate}</td>
+                <td>\${formattedDate}</td>
                 <td><strong>\${item.clientName}</strong></td>
                 <td>\${item.warehouseName}</td>
                 <td><span class="badge bg-label-success">\${item.category}</span></td>
@@ -175,11 +181,14 @@
         });
     }
 
+    // --- ▲ [수정] ---
+
     const salesModal = new bootstrap.Modal(document.getElementById('salesModal'));
 
     function openRegisterModal() {
         $('#salesId').val('');
         $('#modalSalesDate').val(new Date().toISOString().split('T')[0]);
+        // [수정] Select2 로직 제거, input 값 비우기로 원복
         $('#modalClientName, #modalWarehouseName, #modalCategory, #modalAmount, #modalDescription').val('');
         $('#modalCategory').val('');
         $('#modalTitle').text('신규 매출 등록');
@@ -191,9 +200,14 @@
     function openDetailModal(id) {
         $.get(API_BASE_URL + '/' + id, function (data) {
             $('#salesId').val(data.id);
-            $('#modalSalesDate').val(data.salesDate);
+
+            // [수정] 날짜 포맷팅 적용 (쉼표를 하이픈으로)
+            $('#modalSalesDate').val(data.salesDate ? String(data.salesDate).replace(/,/g, '-') : '');
+
+            // [수정] Select2 로직 제거, input 값 채우기로 원복
             $('#modalClientName').val(data.clientName);
             $('#modalWarehouseName').val(data.warehouseName);
+
             $('#modalCategory').val(data.category);
             $('#modalAmount').val(data.amount);
             $('#modalDescription').val(data.description);
@@ -218,13 +232,17 @@
         if (confirm('삭제하시겠습니까?')) sendRequest('DELETE', API_BASE_URL + '/' + $('#salesId').val(), '삭제되었습니다.');
     }
 
+    // [수정] Select2가 아닌 input의 val()을 사용 (기존 코드와 동일)
     function sendRequest(method, url, msg) {
         $.ajax({
             url: url, type: method, contentType: 'application/json',
             data: method === 'DELETE' ? null : JSON.stringify({
-                salesDate: $('#modalSalesDate').val(), clientName: $('#modalClientName').val(),
-                warehouseName: $('#modalWarehouseName').val(), category: $('#modalCategory').val(),
-                amount: $('#modalAmount').val(), description: $('#modalDescription').val()
+                salesDate: $('#modalSalesDate').val(),
+                clientName: $('#modalClientName').val(),
+                warehouseName: $('#modalWarehouseName').val(),
+                category: $('#modalCategory').val(),
+                amount: $('#modalAmount').val(),
+                description: $('#modalDescription').val()
             }),
             success: function () {
                 alert(msg);

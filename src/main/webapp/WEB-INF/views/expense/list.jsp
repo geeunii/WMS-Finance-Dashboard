@@ -122,6 +122,7 @@
 
 <script>
     const CONTEXT_PATH = '${pageContext.request.contextPath}';
+    // [수정] 지출 API 기본 URL
     const API_BASE_URL = CONTEXT_PATH + '/expense/api';
 
     $(document).ready(function () {
@@ -140,41 +141,56 @@
             },
             dataType: 'json',
             success: function (res) {
-                renderTable(res.expenses);
+                // [수정] DTO에 expenseCode가 포함된 expense 리스트를 사용
+                renderTable(res.expenses); // (DTO 필드명이 expenses라고 가정)
                 renderPagination(res);
             },
             error: function () {
-                $('#tableBody').html('<tr><td colspan="6" class="text-center py-3 text-danger">데이터 로드 실패</td></tr>');
+                $('#tableBody').html('<tr><td colspan="7" class="text-center py-3 text-danger">데이터 로드 실패</td></tr>');
             }
         });
     }
 
+    // --- ▼ [수정] 지출 목록에 맞게 수정한 최종본 ---
     function renderTable(list) {
         let tbody = $('#tableBody').empty();
+
         if (!list || list.length === 0) {
+            // [수정] colspan을 6으로 변경 (지출 목록 스크린샷 기준)
             tbody.append('<tr><td colspan="6" class="text-center py-3">데이터가 없습니다.</td></tr>');
             return;
         }
+
         list.forEach(item => {
+            // 금액 포맷
             let amt = new Intl.NumberFormat('ko-KR').format(item.amount);
 
-            // [수정] <td>\${item.id}</td> -> <td>\${item.expenseCode}</td>
+            // 날짜 포맷: "2025,11,10" -> "2025-11-10"
+            let formattedDate = item.expenseDate ? String(item.expenseDate).replace(/,/g, '-') : '-';
+
+            // DTO의 expenseCode 필드를 사용 (Service에서 생성한 값)
+            // [수정] 스크린샷에 맞게 <td> 구성
             tbody.append(`<tr style="cursor:pointer" onclick="openDetailModal(\${item.id})">
                 <td>\${item.expenseCode}</td>
-                <td>\${item.expenseDate}</td>
-                <td><strong>\${item.warehouseName}</strong></td>
-                <td><span class="badge bg-label-danger">\${item.category}</span></td>
+                <td>\${formattedDate}</td>
+                <td>\${item.warehouseName}</td>
+                <td><span class="badge bg-label-secondary">\${item.category}</span></td>
                 <td class="text-end fw-bold text-danger">\${amt}원</td>
                 <td>\${item.description || '-'}</td>
             </tr>`);
         });
     }
 
+    // --- ▲ [수정] ---
+
+    // [수정] 모달 ID를 (expenseModal)로 가정. (만약 salesModal을 재활용하면 ID 변경 불필요)
     const expenseModal = new bootstrap.Modal(document.getElementById('expenseModal'));
 
     function openRegisterModal() {
-        $('#expenseId').val('');
+        $('#expenseId').val(''); // (ID 필드가 expenseId라고 가정)
         $('#modalExpenseDate').val(new Date().toISOString().split('T')[0]);
+
+        // [수정] Select2 로직 제거, input 값 비우기로 원복
         $('#modalWarehouseName, #modalCategory, #modalAmount, #modalDescription').val('');
         $('#modalCategory').val('');
         $('#modalTitle').text('신규 지출 등록');
@@ -185,9 +201,14 @@
 
     function openDetailModal(id) {
         $.get(API_BASE_URL + '/' + id, function (data) {
-            $('#expenseId').val(data.id);
-            $('#modalExpenseDate').val(data.expenseDate);
+            $('#expenseId').val(data.id); // (ID 필드가 expenseId라고 가정)
+
+            // [수정] 날짜 포맷팅 적용 (쉼표를 하이픈으로)
+            $('#modalExpenseDate').val(data.expenseDate ? String(data.expenseDate).replace(/,/g, '-') : '');
+
+            // [수정] Select2 로직 제거, input 값 채우기로 원복
             $('#modalWarehouseName').val(data.warehouseName);
+
             $('#modalCategory').val(data.category);
             $('#modalAmount').val(data.amount);
             $('#modalDescription').val(data.description);
@@ -212,6 +233,7 @@
         if (confirm('삭제하시겠습니까?')) sendRequest('DELETE', API_BASE_URL + '/' + $('#expenseId').val(), '삭제되었습니다.');
     }
 
+    // [수정] 지출 DTO에 맞게 전송 데이터 변경 (clientName 제거)
     function sendRequest(method, url, msg) {
         $.ajax({
             url: url, type: method, contentType: 'application/json',
