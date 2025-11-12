@@ -12,7 +12,6 @@
     - jQuery 3.x
     - Bootstrap 5
     - ApexCharts.js
-    - Select2.js
   - **Backend**:
     - Java 17
     - Spring Framework 5.x
