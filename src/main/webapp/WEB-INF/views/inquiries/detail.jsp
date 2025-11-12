@@ -119,7 +119,7 @@
 </div>
 
 <script>
-    const inquiryId = ${inquiry.inquiryId};
+    const inquiryId = '${inquiry.inquiryId}';
     const loginId = '${sessionScope.loginId}';
     let currentReply = null;
 
@@ -205,10 +205,20 @@
 
     // 답글 작성 모달 열기
     function openCreateModal() {
+        console.log('------작성 버튼 클릭됨------')
         document.getElementById('formModalTitle').textContent = '답글 작성';
         document.getElementById('replyForm').reset();
         document.getElementById('replyId').value = '';
         document.getElementById('formModal').classList.add('show');
+
+        const modal = document.getElementById('formModal');
+        modal.style.display = 'block';           // 보이기
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
     }
 
     // 답글 수정 모달 열기
@@ -222,6 +232,7 @@
 
     // 답글 저장 (작성/수정)
     async function submitReply() {
+        console.log('------submitReply 실행됨------')
         const replyId = document.getElementById('replyId').value;
         const content = document.getElementById('content').value.trim();
 
@@ -273,11 +284,13 @@
 
     // 모달 닫기
     function closeDetailModal() {
+        document.getElementById('detailModal').style.display = 'none';
         document.getElementById('detailModal').classList.remove('show');
         currentReply = null;
     }
 
     function closeFormModal() {
+        document.getElementById('formModal').style.display = 'none';
         document.getElementById('formModal').classList.remove('show');
     }
 

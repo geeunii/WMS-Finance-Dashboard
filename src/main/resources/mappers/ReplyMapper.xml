@@ -18,8 +18,8 @@
     </select>
 
     <insert id="insertReply" parameterType="com.ssg.wms.reply.dto.ReplyDTO" useGeneratedKeys="true" keyProperty="replyId">
-        INSERT INTO reply (inquiry_id, title, writer, content)
-        VALUES (#{inquiryId}, #{title}, #{writer}, #{content});
+        INSERT INTO reply (inquiry_id, writer, content)
+        VALUES (#{inquiryId}, #{writer}, #{content});
     </insert>
 
     <select id="findByIdAndInquiryId" resultType="com.ssg.wms.reply.dto.ReplyDTO">
