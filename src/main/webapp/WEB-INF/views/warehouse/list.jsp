@@ -86,6 +86,20 @@
     if (jsonString && jsonString.trim().length > 0) {
       // JSON 파싱 시 'jsWarehouseData' 변수에 유효한 JSON 문자열이 담겨야 합니다.
       warehouseData = JSON.parse(jsonString.replace(/&quot;/g, '"')); // 혹시 모를 HTML 엔티티 치환 처리
+
+//오름차순 내림차순 지정 기능
+      warehouseData.sort(function(a, b) {
+        // ID를 숫자로 변환하여 비교합 (b - a 이면 내림차순)
+
+        var idA = Number(a.warehouseId);
+        var idB = Number(b.warehouseId);
+
+        // 유효한 숫자가 아닐 경우를 대비하여 0을 기본값으로 사용
+        return (idA || 0) - (idB || 0);
+      });
+
+      // -------------------------------------------------------------
+
     }
   } catch(e) {
     console.error("창고 데이터 JSON 파싱 오류:", e);

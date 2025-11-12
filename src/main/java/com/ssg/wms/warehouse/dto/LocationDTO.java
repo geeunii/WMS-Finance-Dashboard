@@ -17,7 +17,7 @@ public class LocationDTO {
     /// 수정시만 등록
     private Long locationId;
 
-    /// - 위치가 속한 창고 ID (DB의 LOCATION 테이블에 저장됨)
+    /// - 위치가 속한 창고 ID -> LOCATION 테이블에 저장됨)
     private Long warehouseId;
 
     /// 위치 코드 (예: A-01-01)
