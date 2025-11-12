@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class ExpenseVO {
     private Long id;          // 지출 ID (PK)
     private String expenseCode; // 지출 관리번호
+    private String status;
     private String warehouseName;    // 창고명
     private LocalDate expenseDate;   // 지출일자
     private String category;         // 지출 분류
