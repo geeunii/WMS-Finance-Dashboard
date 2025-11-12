@@ -97,10 +97,18 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
 
                 // 5-3. 위치 (LOCATION) 정보 등록 추가
                 if (section.getLocations() != null && !section.getLocations().isEmpty()) {
-                    Long sectionId = section.getSectionId(); // Mapper 호출 후 PK가 채워진 상태 가정
+                    // Long sectionId = section.getSectionId(); // 기존 sectionId 변수는 사용하지 않음
 
                     for (LocationDTO location : section.getLocations()) {
-                        location.setSectionId(sectionId);
+
+                        // 🟢 [수정 사항]: locationTypeCode가 누락된 경우 "A구역"으로 기본값 설정
+                        if (location.getLocationTypeCode() == null || location.getLocationTypeCode().isEmpty()) {
+                            location.setLocationTypeCode("A구역");
+                            log.warn("locationTypeCode이 누락되어 'A구역'으로 기본값을 설정합니다.");
+                        }
+
+                        // warehouse_id 설정 (이전 수정 사항)
+                        location.setWarehouseId(warehouseId);
 
                         // Mapper를 호출하여 LOCATION 테이블에 삽입
                         int locationInsertedRows = warehouseAdminMapper.insertLocation(location);

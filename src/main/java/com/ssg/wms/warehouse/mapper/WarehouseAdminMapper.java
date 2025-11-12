@@ -8,8 +8,6 @@ import java.util.List;
 @Mapper
 public interface WarehouseAdminMapper {
 
-    // ------------------- 등록 관련 메서드 -------------------
-
     /** 창고 등록 (Warehouse ID 자동 생성) */
     int insertWarehouse(WarehouseSaveDTO saveDTO);
 
@@ -24,7 +22,11 @@ public interface WarehouseAdminMapper {
     /** 창고 이름 중복 확인 */
     int countWarehouseName(@Param("name") String name);
 
-    // ------------------- 조회/수정/삭제 관련 메서드 -------------------
+
+
+
+
+    ///조회/수정/삭제
 
     /** 창고 수정 */
     int updateWarehouse(WarehouseUpdateDTO updateDTO);

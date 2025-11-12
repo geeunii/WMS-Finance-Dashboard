@@ -57,13 +57,13 @@
 
     <insert id="insertLocation" parameterType="com.ssg.wms.warehouse.dto.LocationDTO">
         INSERT INTO LOCATION (
-            section_id,
+            warehouse_id,
             location_code,
             floor_num,
             location_type_code,
             max_volume
         ) VALUES (
-                     #{sectionId},
+                     #{warehouseId},
                      #{locationCode},
                      #{floorNum},
                      #{locationTypeCode},

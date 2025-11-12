@@ -38,11 +38,9 @@ public class WarehouseMemberController {
         this.objectMapper = objectMapper;
     }
 
-    // ----------------------------------------------------------------------
-    // 1. View Controller (화면 로드)
-    // ----------------------------------------------------------------------
 
-    // 창고 위치 조회 (메인 페이지 역할) 및 목록 조회 화면 로드
+    /// 1. View Controller
+    /// 창고 위치 조회
     @GetMapping({"/location", ""})
     public String getWarehouseListView(
             @ModelAttribute WarehouseSearchDTO searchForm,
@@ -50,14 +48,12 @@ public class WarehouseMemberController {
             RedirectAttributes redirectAttributes,
             HttpSession session) { //
 
-        // 세션에서 사용자 ID를 가져오는 로직
+        /// 세션에서 사용자 ID를 가져오는 로직
         Long loggedInUserId = null;
         Object userIdObj = session.getAttribute("userId"); // 세션 키가 "userId"라고 가정
 
         if (userIdObj != null) {
-            try {
-                // 세션 값이 Long 타입임을 가정하고 캐스팅
-                loggedInUserId = (Long) userIdObj;
+            try {loggedInUserId = (Long) userIdObj;
             } catch (ClassCastException e) {
                 // 세션에 String으로 저장되었을 경우 (예외 처리 후 String으로 변환 시도)
                 try {

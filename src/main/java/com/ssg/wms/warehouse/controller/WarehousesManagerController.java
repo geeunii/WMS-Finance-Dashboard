@@ -61,7 +61,7 @@ public class WarehousesManagerController {
             Long newWarehouseId = warehouseManagerService.saveWarehouse(saveDTO);
 
             redirectAttributes.addFlashAttribute("message", newWarehouseId + "번 창고 등록이 완료되었습니다.");
-            // 💡 리다이렉트 경로 수정
+
             return "redirect:/mgr/warehouses";
         } catch (IllegalArgumentException e) {
             bindingResult.rejectValue("name", "name.duplicate", e.getMessage());
