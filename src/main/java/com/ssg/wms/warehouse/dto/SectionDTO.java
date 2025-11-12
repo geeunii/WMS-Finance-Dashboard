@@ -17,10 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class SectionDTO {
 
-    // 수정 시에만 사용되므로 등록 시에는 null이 허용됩니다.
     private Long sectionId;
-
-    // 이 DTO가 어느 창고에 속하는지 나타내지만, 폼 바인딩에서는 사용되지 않을 수 있습니다.
     private Long warehouseId;
 
     /// 위치 DTO
@@ -28,7 +25,7 @@ public class SectionDTO {
     @Valid
     private List<LocationDTO> locations = new ArrayList<>();
 
-    ///창고 구역 이름 (A/B/C/D
+    ///창고 구역 이름 (A구역/B구역/C구역/D구역)
     @NotBlank(message = "구역 이름은 필수 입력 항목입니다.")
     private String sectionName;
 
