@@ -102,9 +102,9 @@
       background-color: #f1f1f1;
     }
 
-    /* 🌟 반응형 미디어 쿼리 추가 🌟 */
+
     @media (max-width: 768px) {
-      /* 768px 이하일 때, 페이지 컨테이너 너비를 더 확대 (좌우 여백 최소화) */
+
       .page-wrapper {
         width: 98%;
         margin-top: 10px;
@@ -117,7 +117,7 @@
         -webkit-overflow-scrolling: touch; /* iOS에서 부드러운 스크롤 */
       }
 
-      /* 테이블 셀 패딩을 줄여서 한 화면에 더 많이 보이게 함 */
+      /* 테이블 셀 패딩을 줄여서 한 화면에 더 많이 보이게  */
       th, td {
         padding: 8px 10px;
         font-size: 0.8em;
