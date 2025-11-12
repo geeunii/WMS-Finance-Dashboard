@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -178,5 +179,29 @@ public class InboundMemberController {
     }
 
     // 입고 요청 취소
+    @PostMapping("/cancel")
+    public String cancelInbound(HttpSession session,
+                                @RequestParam("inboundId") int inboundId,
+                                RedirectAttributes redirectAttributes) {
+
+        try {
+            boolean result = inboundMemberService.cancelInbound(inboundId);
+
+            if (result) {
+                redirectAttributes.addFlashAttribute("message", "입고 요청이 취소되었습니다.");
+                redirectAttributes.addFlashAttribute("messageType", "success");
+            } else {
+                redirectAttributes.addFlashAttribute("message", "입고 요청 취소에 실패했습니다.");
+                redirectAttributes.addFlashAttribute("messageType", "error");
+            }
+
+        } catch (Exception e) {
+            log.error("입고 취소 중 오류 발생 - inboundId: {}", inboundId, e);
+            redirectAttributes.addFlashAttribute("message", "입고 취소 중 오류가 발생했습니다.");
+            redirectAttributes.addFlashAttribute("messageType", "error");
+        }
+
+        return "redirect:/inbound/member/list";
+    }
 
 }

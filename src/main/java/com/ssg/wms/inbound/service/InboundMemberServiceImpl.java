@@ -121,4 +121,12 @@ public class InboundMemberServiceImpl implements InboundMemberService {
         return inboundMemberMapper.selectInboundWithItems(inboundRequestDTO.getInboundId());
     }
 
+    @Transactional
+    @Override
+    public boolean cancelInbound(int inboundId) {
+        inboundMemberMapper.cancelInboundItems(inboundId);
+        int result = inboundMemberMapper.cancelInbound(inboundId);
+        return result > 0;
+    }
+
 }

@@ -19,9 +19,9 @@
                 <!-- 상태 필터 드롭다운 -->
                 <select id="statusFilter" class="form-select w-auto d-inline mb-3">
                     <option value="">전체</option>
-                    <option value="request" ${param.status == 'request' ? 'selected' : ''}>대기</option>
-                    <option value="cancelled" ${param.status == 'cancelled' ? 'selected' : ''}>취소</option>
-                    <option value="approved" ${param.status == 'approved' ? 'selected' : ''}>승인</option>
+                    <option value="request" ${param.status == 'request' ? 'selected' : ''}>처리 대기</option>
+                    <option value="cancelled" ${param.status == 'cancelled' ? 'selected' : ''}>요청 취소</option>
+                    <option value="approved" ${param.status == 'approved' ? 'selected' : ''}>승인 완료</option>
                     <option value="rejected" ${param.status == 'rejected' ? 'selected' : ''}>반려</option>
                 </select>
             </th>
@@ -45,6 +45,10 @@
         </tbody>
     </table>
 </div>
+
+<form id="inboundForm" method="post" style="display:none;">
+    <input type="hidden" name="inboundId" id="formInboundId" value="">
+</form>
 
 <!-- 모달 JSP 인클루드 -->
 <%@ include file="inboundModal.jsp" %>
@@ -284,7 +288,7 @@
             // 모달 root 먼저 가져오기
             const modalEl = document.getElementById('inboundModal');
             if (!modalEl) {
-                console.error('❌ inboundModal NOT found in current document.');
+                console.error('inboundModal NOT found in current document.');
                 return;
             }
             const inboundModal = new bootstrap.Modal(modalEl);
@@ -313,14 +317,41 @@
                     const rejectSection         = modalEl.querySelector('#rejectReasonSection');
                     const inboundRejectReasonEl = modalEl.querySelector('#inboundRejectReason');
 
+                    // 버튼 속성 제어용 변수 선언
+                    const updateBtn = modalEl.querySelector('#updateInboundBtn');
+                    const cancelBtn = modalEl.querySelector('#cancelInboundBtn');
+
                     if (!inboundInput) {
-                        console.error('❌ inboundId input not found INSIDE modal. modalEl.innerHTML snapshot:', modalEl.innerHTML.slice(0,500));
+                        console.error('inboundId input not found INSIDE modal. modalEl.innerHTML snapshot:', modalEl.innerHTML.slice(0,500));
                         return;
                     }
 
                     // 데이터 채우기
                     inboundInput.value = data.inboundId || '';
-                    if (inboundStatusEl) inboundStatusEl.value = data.inboundStatusKor || '';
+                    if (inboundStatusEl) {
+                        inboundStatusEl.value = data.inboundStatusKor || '';
+
+                        // 기존 Bootstrap 클래스 제거
+                        inboundStatusEl.classList.remove('bg-success', 'bg-primary', 'bg-danger', 'text-white');
+
+                        // 상태에 따라 Bootstrap 클래스 추가
+                        switch(data.inboundStatus) {
+                            case 'approved':
+                                inboundStatusEl.classList.add('bg-success', 'text-white');
+                                break;
+                            case 'request':
+                                inboundStatusEl.classList.add('bg-primary', 'text-white');
+                                break;
+                            case 'rejected':
+                            case 'cancelled':
+                                inboundStatusEl.classList.add('bg-danger', 'text-white');
+                                break;
+                        }
+                    }
+
+
+
+
                     if (warehouseIdEl) warehouseIdEl.value = data.warehouseId || '';
                     if (warehouseNameEl) warehouseNameEl.value = data.warehouseName || '미지정';
                     if (partnerNameEl) partnerNameEl.value = data.partnerName || '';
@@ -339,8 +370,44 @@
                         if (rejectSection) rejectSection.style.display = 'none';
                     }
 
+                    // 버튼 상태 제어: 취소, 승인, 반려 시 수정/취소 버튼 숨김
+                    if (['cancelled', 'approved', 'rejected'].includes(data.inboundStatus)) {
+                        if (updateBtn) updateBtn.style.display = 'none';
+                        if (cancelBtn) cancelBtn.style.display = 'none';
+                    } else {
+                        if (updateBtn) updateBtn.style.display = 'inline-block';
+                        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+                    }
+
+
+
                     // 상품 렌더링
                     renderInboundItems(data.inboundItems, data.categories || []);
+
+
+
+                    // 버튼 상태 제어: 취소, 승인, 반려 시 수정/취소 버튼 숨김
+                    if (['cancelled', 'approved', 'rejected'].includes(data.inboundStatus)) {
+                        if (updateBtn) updateBtn.style.display = 'none';
+                        if (cancelBtn) cancelBtn.style.display = 'none';
+                    } else {
+                        if (updateBtn) updateBtn.style.display = 'inline-block';
+                        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+                    }
+
+                    // 상품 추가/삭제 버튼 비활성화/활성화
+                    const addItemBtn = modalEl.querySelector('#addInboundItemBtn');
+                    const deleteBtns = modalEl.querySelectorAll('#inboundItemsBody .removeItemBtn');
+
+                    if (data.inboundStatus === 'request') {
+                        if (addItemBtn) addItemBtn.disabled = false;
+                        deleteBtns.forEach(btn => btn.disabled = false);
+                    } else {
+                        if (addItemBtn) addItemBtn.disabled = true;
+                        deleteBtns.forEach(btn => btn.disabled = true);
+                    }
+
+
 
                     // 모달 열기
                     inboundModal.show();
@@ -409,6 +476,16 @@
                     alert('수정 중 오류가 발생했습니다.');
                 });
         });
+
+        // 입고 취소 버튼
+        document.getElementById("cancelInboundBtn").addEventListener("click", function() {
+            const form = document.getElementById("inboundForm");
+            form.action = "/inbound/member/cancel";
+            form.formInboundId.value = document.getElementById("inboundId").value;
+            form.submit();
+        });
+
+
 
 
 
