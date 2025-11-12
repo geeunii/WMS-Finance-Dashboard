@@ -9,19 +9,19 @@ import java.util.List;
 
 public interface WarehouseAdminService {
 
-    /** 창고 이름 중복 확인 */
+    /// 창고 이름 중복 확인
     boolean checkNameDuplication(String name);
 
-    /** 창고 등록 (Geocoding 연동 및 구역 등록 포함) */
+    /// 창고 등록 (Geocoding 구역 등록 포함)
     Long saveWarehouse(WarehouseSaveDTO saveDTO) throws Exception;
 
-    /** 창고 수정 */
+    /// 창고 수정
     void updateWarehouse(Long id, WarehouseUpdateDTO updateDTO) throws Exception;
 
-    /** 창고 삭제 */
+    /// 창고 삭제
     void deleteWarehouse(Long id);
 
-    /** 창고 상태 업데이트 */
+    //// 창고 상태 업데이트
     void updateWarehouseStatus(Long id, Byte newStatus);
 
     List<WarehouseListDTO> findWarehouses(WarehouseSearchDTO searchForm);

@@ -27,25 +27,25 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
         this.kakaoApiUtil = kakaoApiUtil;
     }
 
-    /** 창고 이름 중복 확인 구현 (Admin) */
+    ///창고 이름 중복 확인 구현
     @Override
     public boolean checkNameDuplication(String name) {
         log.debug("창고 이름 중복 확인 시작 (Admin): {}", name);
         return warehouseAdminMapper.countWarehouseName(name) > 0;
     }
 
-    /** 창고 등록 구현 (Admin) (핵심 로직: Geocoding 연동 및 구역 등록) */
+    ///창고 등록 구현 (Admin)  Geocoding 연동 및 구역 등록
     @Override
     @Transactional
     public Long saveWarehouse(WarehouseSaveDTO saveDTO) throws Exception {
 
-        // 1. 이름 중복 확인
+        /// 1. 이름 중복 확인
         if (checkNameDuplication(saveDTO.getName())) {
             log.warn("등록 실패 (Admin): 이미 존재하는 창고 이름입니다. (이름: {})", saveDTO.getName());
             throw new IllegalArgumentException("이미 존재하는 창고 이름입니다.");
         }
 
-        // 2. Geocoding (카카오 API 호출) - 예외 처리 로직 개선
+        /// 2. Geocoding (카카오 API 호출) - 예외 처리 로직 개선
         Double[] coords;
         try {
             log.info("Geocoding 시작 (Admin). 주소: {}", saveDTO.getAddress());
@@ -57,11 +57,11 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
             throw new Exception("주소 변환(Geocoding)에 실패했습니다. (원인: 주소 변환(Geocoding)에 실패했습니다. 주소를 확인해 주세요.)", e);
         }
 
-        // 3. DTO에 위도(Latitude)와 경도(Longitude) 설정 (카카오 API 응답 순서: [경도, 위도])
+        /// 3. DTO에 위도(Latitude)와 경도(Longitude) 설정 (카카오 API 응답 순서: [경도, 위도])
         saveDTO.setLongitude(coords[0]);
         saveDTO.setLatitude(coords[1]);
 
-        // 4. 창고 (WAREHOUSE) DB에 저장 (PK가 saveDTO.warehouseId에 채워짐)
+        /// 4. 창고 (WAREHOUSE) DB에 저장 (PK가 saveDTO.warehouseId에 채워짐)
         int insertedRows = warehouseAdminMapper.insertWarehouse(saveDTO);
         if (insertedRows != 1) {
             log.error("WAREHOUSE INSERT 실패 (Admin) (영향 받은 행 수: {}). 트랜잭션 롤백.", insertedRows);
@@ -69,7 +69,7 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
         }
         Long warehouseId = saveDTO.getWarehouseId();
 
-        // 5. 구역 (SECTION) 및 위치 (LOCATION) 정보 등록 추가
+        /// 5. 구역 (SECTION) 및 위치 (LOCATION) 정보 등록 추가
         if (saveDTO.getSections() != null && !saveDTO.getSections().isEmpty()) {
             log.info("구역 정보 등록 시작 (Admin). 구역 수: {}", saveDTO.getSections().size());
 
@@ -86,7 +86,7 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
                     }
                 }
 
-                // 5-2. Section 기본 정보 설정 및 저장
+                /// 5-2. Section 기본 정보 설정 및 저장
                 section.setWarehouseId(warehouseId);
                 int sectionInsertedRows = warehouseAdminMapper.insertSection(section);
 
@@ -95,7 +95,7 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
                     throw new RuntimeException("구역 등록 중 오류가 발생했습니다.");
                 }
 
-                // 5-3. 위치 (LOCATION) 정보 등록 추가
+                ///5-3. 위치 (LOCATION) 정보 등록 추가
                 if (section.getLocations() != null && !section.getLocations().isEmpty()) {
                     // Long sectionId = section.getSectionId(); // 기존 sectionId 변수는 사용하지 않음
 
@@ -127,7 +127,7 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
         return warehouseId;
     }
 
-    /** 창고 수정 구현 (Admin) */
+    ///창고 수정 구현
     @Override
     @Transactional
     public void updateWarehouse(Long id, WarehouseUpdateDTO updateDTO) throws Exception {
@@ -143,7 +143,7 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
         log.info("창고 수정 성공 (Admin). ID: {}", id);
     }
 
-    /** 창고 삭제 구현 (Admin) */
+    /// 창고 삭제 구현
     @Override
     @Transactional
     public void deleteWarehouse(Long id) {
@@ -157,7 +157,7 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
         log.info("창고 삭제 성공 (Admin). ID: {}", id);
     }
 
-    /** 창고 상태 업데이트 구현 (Admin) */
+    ///창고 상태 업데이트 구현
     @Override
     @Transactional
     public void updateWarehouseStatus(Long id, Byte newStatus) {

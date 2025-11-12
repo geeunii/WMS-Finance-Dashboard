@@ -1,18 +1,8 @@
-/**
- * warehouse.js
- * 공통 JS 파일: 창고 등록/목록/상세 페이지 지도 기능만 포함 (중복 함수 제거됨)
- */
 
-// ---------------------- 1. (제거됨) 창고 이름 중복 확인 ----------------------
-// -> 이 기능은 register.jsp의 인라인 <script>로 이동되었습니다.
-
-// ---------------------- 2. (제거됨) 등록폼 유효성 검사 ----------------------
-// -> 이 기능은 register.jsp의 인라인 <script>로 이동되었습니다.
-
-// ---------------------- 3. 주소 검색 및 좌표 표시 ----------------------
+//주소 검색 및 좌표 표시
 function searchAddress() {
     const address = document.getElementById("address").value.trim();
-    // JSP 파일의 <span id="coordResult"> 요소에 메시지를 표시합니다.
+    // JSP 파일의 <span id="coordResult"> 요소에 메시지를 표시
     const resultElement = document.getElementById("coordResult");
 
     if (!address) {
@@ -49,7 +39,7 @@ function searchAddress() {
             const marker = new kakao.maps.Marker({ position: position });
             marker.setMap(map);
 
-            // 사용자에게 성공적으로 좌표를 찾았음을 알림 (사용자 편의성 향상)
+
             if (resultElement) {
                 resultElement.textContent = `위치 확인 완료: Lat ${lat.toFixed(4)}, Lng ${lng.toFixed(4)}`;
                 resultElement.style.color = 'green';
@@ -65,7 +55,7 @@ function searchAddress() {
     });
 }
 
-// ---------------------- 4. 등록 페이지 지도 초기화 ----------------------
+// ]등록 페이지 지도 초기화
 function initMapForRegister(mapId) {
     if (typeof kakao === "undefined" || typeof kakao.maps === "undefined") {
         console.error("Kakao 지도 API가 로드되지 않았습니다."); return;
@@ -78,7 +68,7 @@ function initMapForRegister(mapId) {
     const map = new kakao.maps.Map(mapContainer, mapOption);
 }
 
-// ---------------------- 5. 목록 페이지 지도 표시 ----------------------
+//목록 페이지 지도 표시
 function initMapForList(mapId, data) {
     if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined' || !Array.isArray(data) || data.length === 0) {
         // 지도를 표시할 수 없는 경우 처리
@@ -88,7 +78,7 @@ function initMapForList(mapId, data) {
 
     const mapContainer = document.getElementById(mapId);
 
-    // 데이터가 있을 경우 첫 번째 창고를 기준으로 중심 설정 (아니면 서울)
+    // 데이터가 있을 경우 첫 번째 창고를 기준으로 중심 설정 아니면 서울
     const first = data.find(w => w.latitude && w.longitude);
     const lat = Number(first?.latitude) || 37.566826;
     const lng = Number(first?.longitude) || 126.9786567;
@@ -132,7 +122,7 @@ function initMapForList(mapId, data) {
     }
 }
 
-// ---------------------- 6. 상세 페이지 지도 표시 ----------------------
+//상세 페이지 지도 표시
 function initMapForDetail(mapId, warehouse) {
     if (!warehouse || !warehouse.latitude || !warehouse.longitude) return;
 

@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface WarehousesManagerMapper { // MANAGER 전용 Mapper (WarehousesManagerController에서 사용)
 
-    // ADMIN과 동일한 CRUD 및 관리 기능을 정의합니다.
+    // ADMIN과 동일한 기능 리팩토링
     int insertWarehouse(WarehouseSaveDTO saveDTO);
 
     int updateWarehouse(WarehouseUpdateDTO updateDTO);

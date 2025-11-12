@@ -24,7 +24,7 @@ public class WarehousesMemberServiceImpl implements WarehouseMemberService {
         this.warehouseMemberMapper = warehouseMemberMapper;
     }
 
-    /** 창고 목록 조회 (창고 목록 조회 및 창고 위치 조회 메뉴에 사용) */
+    /// 창고 목록 조회 창고 목록 조회 및 창고 위치 조회 메뉴,
     @Override
     public List<WarehouseListDTO> findWarehouses(WarehouseSearchDTO warehouseSearch) {
         log.info("창고 목록 조회 시작 (Member). 검색 조건: {}", warehouseSearch);
@@ -36,7 +36,7 @@ public class WarehousesMemberServiceImpl implements WarehouseMemberService {
         return list;
     }
 
-    /** 창고 상세 조회 (MEMBER는 단순 데이터 조회 목적으로만) */
+    ///창고 상세 조회 MEMBER는 단순 데이터 조회
     @Override
     public WarehouseDetailDTO findWarehouseDetailById(Long id) {
         log.info("창고 상세 조회 시작 (Member). ID: {}", id);

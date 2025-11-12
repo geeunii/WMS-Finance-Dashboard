@@ -14,13 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Log4j2
-// 클래스 이름을 WarehouseManagerServiceImpl로 변경하고 WarehouseManagerService를 구현합니다.
 @Service
 @Transactional
 public class WarehouseManagerServiceImpl implements WarehouseManagerService {
 
-    // 매니저 역할에 맞게 이름은 adminManagerMapper 대신 managerMapper 등으로 변경할 수 있지만,
-    // 현재 구조에서는 Admin 코드를 재사용하므로 그대로 둡니다.
     private final WarehouseAdminMapper adminManagerMapper;
     private final KakaoApiUtil kakaoApiUtil;
 
@@ -33,14 +30,14 @@ public class WarehouseManagerServiceImpl implements WarehouseManagerService {
 //        log.info("WarehouseManagerServiceImpl 초기화 완료.");
     }
 
-    /** 창고 이름 중복 확인 구현 (Manager) */
+    /// 창고 이름 중복 확인 구현
     @Override
     public boolean checkNameDuplication(String name) {
         log.debug("창고 이름 중복 확인 시작 (Manager): {}", name);
         return adminManagerMapper.countWarehouseName(name) > 0;
     }
 
-    /** 창고 등록 구현 (Manager) (핵심 로직: Geocoding 연동 및 구역 등록) */
+    ///창고 등록 구현 (Manager)
     @Override
     @Transactional // 창고와 구역 등록이 모두 성공해야 커밋됩니다.
     public Long saveWarehouse(WarehouseSaveDTO saveDTO) throws Exception {
@@ -75,7 +72,7 @@ public class WarehouseManagerServiceImpl implements WarehouseManagerService {
             throw new RuntimeException("창고 등록에 실패했습니다.");
         }
 
-        // ** PK (warehouseId)는 insertWarehouse 실행 후 DTO에 채워져 있습니다. **
+        ///  warehouseId는 insertWarehouse 실행 후 데이터에 담김
         Long warehouseId = saveDTO.getWarehouseId();
 
         // 5. 구역 (SECTION) 정보 등록 추가
@@ -101,7 +98,7 @@ public class WarehouseManagerServiceImpl implements WarehouseManagerService {
         return warehouseId;
     }
 
-    /** 창고 수정 구현 (Manager) */
+    /// 창고 수정 구현
     @Override
     @Transactional
     public void updateWarehouse(Long id, WarehouseUpdateDTO updateDTO) throws Exception {
@@ -118,7 +115,7 @@ public class WarehouseManagerServiceImpl implements WarehouseManagerService {
         log.info("창고 수정 성공 (Manager). ID: {}", id);
     }
 
-    /** 창고 삭제 구현 (Manager) */
+    /// 창고 삭제 구현
     @Override
     @Transactional
     public void deleteWarehouse(Long id) {
@@ -133,7 +130,7 @@ public class WarehouseManagerServiceImpl implements WarehouseManagerService {
         log.info("창고 삭제 성공 (Manager). ID: {}", id);
     }
 
-    /** 창고 상태 업데이트 구현 (Manager) */
+    /// 창고 상태 업데이트 구현
     @Override
     @Transactional
     public void updateWarehouseStatus(Long id, Byte newStatus) {
