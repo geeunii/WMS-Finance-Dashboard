@@ -123,6 +123,12 @@ public class InboundMemberServiceImpl implements InboundMemberService {
                 log.info("Item - inboundId: {}, productId: {}, quantity: {}",
                         item.getInboundId(), item.getProductId(), item.getQuantity());
             }
+
+            log.info("Calling insertInboundItemsBatch with {} items",
+                    inboundRequestDTO.getInboundRequestItems().size());
+            inboundMemberMapper.insertInboundItemsBatch(inboundRequestDTO.getInboundRequestItems());
+            log.info("insertInboundItemsBatch completed");
+
         }
 
         // 4 최신 데이터 조회 후 출력용 DTO 반환
