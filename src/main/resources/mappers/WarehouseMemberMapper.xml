@@ -21,7 +21,7 @@
         <result property="sectionType" column="section_type"/>
         <result property="sectionPurpose" column="section_purpose"/>
         <result property="allocatedArea" column="allocated_area"/>
-        <!-- 현재 DB 구조상 Section과 Location 직접 연결 불가 -->
+
     </resultMap>
 
     <!-- Warehouse Detail ResultMap -->
