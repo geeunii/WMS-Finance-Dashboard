@@ -22,7 +22,6 @@ public class KakaoApiUtil {
 
     private final String KAKAO_REST_API_KEY;
 
-    // 🌟 변경: 쿼리 파라미터 부분을 제거하고 기본 URL만 남깁니다.
     private final String API_URL = "https://dapi.kakao.com/v2/local/search/address.json";
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -40,9 +39,9 @@ public class KakaoApiUtil {
      */
     public Double[] getCoordinates(String address) throws Exception {
 
-        // 1. 주소 인코딩 로직은 RestTemplate이 처리하므로 제거합니다.
 
-        // 2. HTTP 헤더 설정 (인증 키 포함)
+
+        // 2. HTTP 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + KAKAO_REST_API_KEY);
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -51,7 +50,7 @@ public class KakaoApiUtil {
 
         // 3. API 호출 및 통신 예외 처리 강화
         try {
-            // 🌟🌟🌟 변경: RestTemplate의 URI 템플릿 기능을 사용하여 쿼리 파라미터 전달 🌟🌟🌟
+
             // RestTemplate이 'address' 파라미터 값을 자동으로 인코딩하여 안전하게 요청합니다.
             response = restTemplate.exchange(
                     API_URL + "?query={address}", // URL 템플릿
@@ -60,9 +59,9 @@ public class KakaoApiUtil {
                     String.class,
                     address // 인코딩되지 않은 주소 문자열을 전달
             );
-            // 🌟🌟🌟 ------------------------------------------------------------- 🌟🌟🌟
+
         } catch (HttpClientErrorException e) {
-            // 4xx 에러 (Bad Request, Unauthorized 등) 처리
+            // 4xx 에러 처리
             log.error("카카오 API 호출 실패 (HTTP Status {}). 주소: {}", e.getStatusCode(), address, e);
             throw new Exception("카카오 API 호출 실패: HTTP 상태 코드 " + e.getStatusCode() + " 확인 필요.", e);
         } catch (ResourceAccessException e) {
@@ -70,7 +69,7 @@ public class KakaoApiUtil {
             log.error("카카오 API 통신 중 연결 오류 발생. 주소: {}", address, e);
             throw new Exception("카카오 API 통신 오류(네트워크/타임아웃).", e);
         } catch (Exception e) {
-            // 기타 예상치 못한 통신 오류 처리
+            // 기타 예외  통신 오류 처리
             log.error("카카오 API 호출 중 알 수 없는 오류 발생. 주소: {}", address, e);
             throw new Exception("카카오 API 통신 중 알 수 없는 오류.", e);
         }
@@ -82,7 +81,7 @@ public class KakaoApiUtil {
             throw new Exception("카카오 API 호출 실패: 비정상적인 응답 상태.");
         }
 
-        // 카카오 API 응답 본문을 확인합니다. (디버깅용)
+        // 카카오 API 응답 본문을 확인합니다.
         log.info("카카오 API 응답 성공 (JSON): {}", response.getBody());
 
         // 5. JSON 파싱 및 좌표 추출
@@ -96,7 +95,7 @@ public class KakaoApiUtil {
                 double longitude = firstDocument.path("x").asDouble();
                 double latitude = firstDocument.path("y").asDouble();
 
-                // [경도(longitude), 위도(latitude)] 배열로 반환
+                // 경도(longitude), 위도(latitude) 반환
                 return new Double[]{longitude, latitude};
             }
         } catch (Exception e) {

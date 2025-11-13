@@ -60,8 +60,8 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
         saveDTO.setLongitude(coords[0]);
         saveDTO.setLatitude(coords[1]);
 
-        // 💥 디버깅 로그 추가: DTO 바인딩 성공 확인
-        log.info("📌 DTO 바인딩 성공. 받은 창고 이름: {}", saveDTO.getName());
+
+        log.info(" DTO 데이터 받기 성공. 받은 창고 이름: {}", saveDTO.getName());
 
         /// 4. 창고 (WAREHOUSE) DB에 저장 (PK가 saveDTO.warehouseId에 채워짐)
         int insertedRows = warehouseAdminMapper.insertWarehouse(saveDTO);
@@ -72,8 +72,8 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
         }
 
         Long warehouseId = saveDTO.getWarehouseId();
-        // 💥 디버깅 로그 추가: WAREHOUSE 삽입 성공 확인
-        log.info("📌 WAREHOUSE 삽입 성공. ID: {}", warehouseId);
+
+        log.info("WAREHOUSE 삽입 성공. ID: {}", warehouseId);
 
         /// 5. 구역 (SECTION) 및 위치 (LOCATION) 정보 등록 핵심 로직
         if (saveDTO.getSections() != null && !saveDTO.getSections().isEmpty()) {
@@ -95,8 +95,8 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
                 // 5-2. Section 기본 정보 설정 및 저장 (section.sectionId에 PK가 채워져야 함)
                 section.setWarehouseId(warehouseId);
 
-                // 💥 디버깅 로그 추가: SECTION 삽입 시작 확인
-                log.info("📌 SECTION 삽입 시작: {}", section.getSectionName());
+
+                log.info("SECTION 삽입 시작: {}", section.getSectionName());
 
                 int sectionInsertedRows = warehouseAdminMapper.insertSection(section);
 
@@ -105,7 +105,7 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
                     throw new RuntimeException("구역 등록 중 오류가 발생했습니다.");
                 }
 
-                // 💥 핵심 수정: 방금 저장된 Section ID 획득
+
                 Long sectionId = section.getSectionId();
                 log.debug("Section ID 획득 성공: {}", sectionId);
 

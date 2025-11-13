@@ -76,31 +76,31 @@
       cursor: pointer;
     }
 
-    /* ----- [페이징 스타일] ----- */
-    .pagination-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-      margin-bottom: 30px;
-    }
-    .pagination-link {
-      color: #5a5f78;
-      float: left;
-      padding: 8px 16px;
-      text-decoration: none;
-      border: 1px solid #ddd;
-      margin: 0 4px;
-      border-radius: 4px;
-      transition: background-color 0.3s;
-    }
-    .pagination-link.active {
-      background-color: #5a5f78;
-      color: white;
-      border: 1px solid #5a5f78;
-    }
-    .pagination-link:hover:not(.active) {
-      background-color: #f1f1f1;
-    }
+    /*!* ----- [페이징 스타일] ----- *!*/
+    /*.pagination-container {*/
+    /*  display: flex;*/
+    /*  justify-content: center;*/
+    /*  margin-top: 20px;*/
+    /*  margin-bottom: 30px;*/
+    /*}*/
+    /*.pagination-link {*/
+    /*  color: #5a5f78;*/
+    /*  float: left;*/
+    /*  padding: 8px 16px;*/
+    /*  text-decoration: none;*/
+    /*  border: 1px solid #ddd;*/
+    /*  margin: 0 4px;*/
+    /*  border-radius: 4px;*/
+    /*  transition: background-color 0.3s;*/
+    /*}*/
+    /*.pagination-link.active {*/
+    /*  background-color: #5a5f78;*/
+    /*  color: white;*/
+    /*  border: 1px solid #5a5f78;*/
+    /*}*/
+    /*.pagination-link:hover:not(.active) {*/
+    /*  background-color: #f1f1f1;*/
+    /*}*/
 
 
     @media (max-width: 768px) {
@@ -128,11 +128,11 @@
         height: 300px;
       }
 
-      /* 페이징 버튼 크기 조정 */
-      .pagination-link {
-        padding: 6px 10px;
-        font-size: 0.9em;
-      }
+      /*!* 페이징 버튼 크기 조정 *!*/
+      /*.pagination-link {*/
+      /*  padding: 6px 10px;*/
+      /*  font-size: 0.9em;*/
+      /*}*/
 
       /* 헤더 폰트 크기 조정 */
       h1 {
@@ -188,16 +188,16 @@
       </c:if>
       </tbody>
     </table>
-  </div>
-  <div class="pagination-container">
-    <a href="#" class="pagination-link">&laquo;</a>
-    <a href="#" class="pagination-link">1</a>
-    <a href="#" class="pagination-link active">2</a>
-    <a href="#" class="pagination-link">3</a>
-    <a href="#" class="pagination-link">4</a>
-    <a href="#" class="pagination-link">&raquo;</a>
-  </div>
-</div>
+<%--  </div>--%>
+<%--  <div class="pagination-container">--%>
+<%--    <a href="#" class="pagination-link">&laquo;</a>--%>
+<%--    <a href="#" class="pagination-link">1</a>--%>
+<%--    <a href="#" class="pagination-link active">2</a>--%>
+<%--    <a href="#" class="pagination-link">3</a>--%>
+<%--    <a href="#" class="pagination-link">4</a>--%>
+<%--    <a href="#" class="pagination-link">&raquo;</a>--%>
+<%--  </div>--%>
+<%--</div>--%>
 
 <script type="text/javascript">
   // 서버에서 전달한 warehouseList JSON 데이터를 JS 객체로 변환

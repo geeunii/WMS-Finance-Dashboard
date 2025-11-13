@@ -17,13 +17,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-// 🚨 [추가] HttpSession import
+
 import javax.servlet.http.HttpSession;
 
 import java.util.List;
 
 @Controller
-@RequestMapping("/member/warehouses")
+@RequestMapping("/wh/info")
 public class WarehouseMemberController {
 
     private final WarehouseMemberService memberService;
@@ -48,12 +48,13 @@ public class WarehouseMemberController {
             RedirectAttributes redirectAttributes,
             HttpSession session) { //
 
-        /// 세션에서 사용자 ID를 가져오는 로직
-        Long loggedInUserId = null;
-        Object userIdObj = session.getAttribute("userId"); // 세션 키가 "userId"라고 가정
 
+
+        Long loggedInUserId = null;
+        Object userIdObj = session.getAttribute("userId");
         if (userIdObj != null) {
-            try {loggedInUserId = (Long) userIdObj;
+            try {
+                loggedInUserId = (Long) userIdObj;
             } catch (ClassCastException e) {
                 // 세션에 String으로 저장되었을 경우 (예외 처리 후 String으로 변환 시도)
                 try {
@@ -65,17 +66,20 @@ public class WarehouseMemberController {
         }
 
 
+        if (loggedInUserId == null) {
+
+            redirectAttributes.addFlashAttribute("error", "로그인 정보가 유효하지 않습니다.");
+            return "redirect:/login"; // 예시: 로그인 페이지로 리다이렉트
+        }
 
         try {
             List<WarehouseListDTO> list = memberService.findWarehouses(searchForm);
 
-            // 1. 테이블 출력용: DTO List 그대로 Model에 담기
             model.addAttribute("tableWarehouseList", list);
 
-            // 2. JavaScript 지도용: DTO 목록을 JSON 문자열로 변환
+
             String jsonList = objectMapper.writeValueAsString(list);
 
-            // 3. JavaScript용 데이터는 별도의 이름으로 Model에 담기
             model.addAttribute("jsWarehouseData", jsonList);
 
         } catch (JsonProcessingException e) {
@@ -91,7 +95,7 @@ public class WarehouseMemberController {
         return "warehouse/list";
     }
 
-    
+
     // 창고 상세 화면 로드 (MEMBER는 조회만 가능)
     @GetMapping("/{whid}")
     public String getWarehouseDetailView(@PathVariable("whid") Long warehouseId, Model model, RedirectAttributes redirectAttributes) {
@@ -104,21 +108,22 @@ public class WarehouseMemberController {
             // 창고 ID를 찾지 못했을 때
             redirectAttributes.addFlashAttribute("error", "요청하신 창고 정보를 찾을 수 없습니다.");
 
-            return "redirect:/member/warehouses";
+            return "redirect:/mbr/warehouses";
         }
 
 
         return "warehouse/detail";
     }
 
-    // 창고 목록 데이터 조회 (JSON 제공)
+    // 창고 목록 데이터 조회
     @GetMapping("/api/warehouses")
     @ResponseBody
     public List<WarehouseListDTO> getWarehouseList(@ModelAttribute WarehouseSearchDTO searchForm) {
+
         return memberService.findWarehouses(searchForm);
     }
 
-    // 창고 상세 데이터 조회 (JSON 제공)
+
     @GetMapping("/api/warehouses/{whid}")
     @ResponseBody
     public WarehouseDetailDTO getWarehouseDetail(@PathVariable("whid") Long warehouseId) {

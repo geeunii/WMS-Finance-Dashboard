@@ -24,7 +24,7 @@ public class WarehouseAdminController {
     private final WarehouseAdminService warehouseAdminService;
     private final WarehouseMemberService memberService;
     private final ObjectMapper objectMapper;
-    private static final Long MOCK_ADMIN_ID = 1L;
+
 
     @Autowired
     public WarehouseAdminController(
@@ -46,7 +46,7 @@ public class WarehouseAdminController {
         model.addAttribute("warehouseList", list);
         model.addAttribute("userRole", "ADMIN");
 
-        // ✨ JSON 변환 및 모델 추가 로직 ✨
+
         try {
             String jsonList = objectMapper.writeValueAsString(list);
             model.addAttribute("jsWarehouseData", jsonList);
@@ -86,7 +86,6 @@ public class WarehouseAdminController {
 
         try {
             // Service 계층으로 전달 전 Admin ID 설정
-            saveDTO.setAdminId(MOCK_ADMIN_ID);
             Long newWarehouseId = warehouseAdminService.saveWarehouse(saveDTO);
             log.info("창고 등록 성공. ID: {}", newWarehouseId);
 
@@ -162,7 +161,6 @@ public class WarehouseAdminController {
         }
 
         try {
-            updateDTO.setAdminId(MOCK_ADMIN_ID);
             warehouseAdminService.updateWarehouse(warehouseId, updateDTO);
 
             redirectAttributes.addFlashAttribute("message", warehouseId + "번 창고 수정이 완료되었습니다.");

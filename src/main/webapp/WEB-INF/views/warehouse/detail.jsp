@@ -21,7 +21,7 @@
     }
     .info-box { flex-basis: 55%; }
     .map-box { flex-basis: 40%; }
-    .section-list-box { flex-basis: 100%; margin-top: 20px; } /* 💥 section-list-box 스타일 다시 추가 */
+    .section-list-box { flex-basis: 100%; margin-top: 20px; }
 
 
     table.info-table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }

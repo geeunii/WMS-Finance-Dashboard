@@ -15,7 +15,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @Controller
-// 💡 Tomcat Manager 충돌 방지를 위해 경로를 /mgr/warehouses로 변경
+// Tomcat Manager 충돌 방지를 위해 경로를 /mgr/warehouses로 변경
 @RequestMapping("/mgr/warehouses")
 public class WarehousesManagerController {
 
@@ -32,8 +32,7 @@ public class WarehousesManagerController {
         this.memberService = memberService;
     }
 
-    // ------------------- 1. View Controller (화면 로드 및 폼 처리) -------------------
-
+    //화면
     @GetMapping({"", "/location"})
     public String managerListIndex(@ModelAttribute("searchForm") WarehouseSearchDTO searchForm, Model model) {
         List<WarehouseListDTO> list = memberService.findWarehouses(searchForm);
@@ -57,7 +56,7 @@ public class WarehousesManagerController {
         }
 
         try {
-            saveDTO.setAdminId(MOCK_ADMIN_ID);
+
             Long newWarehouseId = warehouseManagerService.saveWarehouse(saveDTO);
 
             redirectAttributes.addFlashAttribute("message", newWarehouseId + "번 창고 등록이 완료되었습니다.");
@@ -110,19 +109,18 @@ public class WarehousesManagerController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.updateDTO", bindingResult);
             redirectAttributes.addFlashAttribute("updateDTO", updateDTO);
-            //  리다이렉트 경로 수정
+
             return "redirect:/mgr/warehouses/" + warehouseId + "/modify";
         }
 
         try {
-            updateDTO.setAdminId(MOCK_ADMIN_ID);
             warehouseManagerService.updateWarehouse(warehouseId, updateDTO);
             redirectAttributes.addFlashAttribute("message", warehouseId + "번 창고 수정이 완료되었습니다.");
-            // 💡 리다이렉트 경로 수정
+
             return "redirect:/mgr/warehouses/" + warehouseId;
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "수정 실패: " + e.getMessage());
-            //  리다이렉트 경로 수정
+
             return "redirect:/mgr/warehouses/" + warehouseId;
         }
     }
@@ -132,11 +130,11 @@ public class WarehousesManagerController {
         try {
             warehouseManagerService.deleteWarehouse(warehouseId);
             redirectAttributes.addFlashAttribute("message", "창고(" + warehouseId + ")가 삭제되었습니다.");
-            //  리다이렉트 경로 수정
+
             return "redirect:/mgr/warehouses";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "삭제 실패: " + e.getMessage());
-            //  리다이렉트 경로 수정
+
             return "redirect:/mgr/warehouses/" + warehouseId;
         }
     }
