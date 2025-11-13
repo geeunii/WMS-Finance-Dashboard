@@ -65,6 +65,7 @@ CREATE TABLE `Member` (
     `member_name` varchar(255) NOT NULL,
     `member_phone` varchar(255) NOT NULL,
     `member_email` varchar(255) NOT NULL,
+    `business_number` varchar(20) NOT NULL,
     `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
     `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
     `status` varchar(20) NOT NULL DEFAULT 'PENDING',
@@ -189,23 +190,23 @@ CREATE TABLE `inbound_item` (
 -- ===========================
 -- 13. outboundRequest
 -- ===========================
-CREATE TABLE `outboundRequest` (
-    `outboundRequest_ID` int NOT NULL AUTO_INCREMENT,
-    `outboundDate` TIMESTAMP NULL,
-    `approvedStatus` varchar(100) NULL,
-    `outboundAddress` varchar(100) NULL,
-    `member_id` bigint NOT NULL,
-    `warehouse_id` int NOT NULL,
-    `staff_id` bigint NOT NULL,
-    `requestedDeliveryDate` TIMESTAMP NULL,
-    PRIMARY KEY (`outboundRequest_ID`),
-    CONSTRAINT `FK_Member_TO_outboundRequest_1`
-        FOREIGN KEY (`member_id`) REFERENCES `Member` (`member_id`),
-    CONSTRAINT `FK_WAREHOUSE_TO_outboundRequest_1`
-        FOREIGN KEY (`warehouse_id`) REFERENCES `WAREHOUSE` (`warehouse_id`),
-    CONSTRAINT `FK_Staff_TO_outboundRequest_1`
-        FOREIGN KEY (`staff_id`) REFERENCES `Staff` (`staff_id`)
+CREATE TABLE outboundRequest (
+                                 outboundRequest_ID    INT AUTO_INCREMENT PRIMARY KEY,
+                                 outboundDate          TIMESTAMP NULL,
+                                 approvedStatus        VARCHAR(100) NULL,
+                                 outboundAddress       VARCHAR(100) NULL,
+                                 member_id             BIGINT NOT NULL,
+                                 warehouse_id          INT NULL,
+                                 staff_id              BIGINT NULL,
+                                 requestedDeliveryDate TIMESTAMP NULL,
+                                 CONSTRAINT FK_Member_TO_outboundRequest_1
+                                     FOREIGN KEY (member_id) REFERENCES Member (member_id),
+                                 CONSTRAINT FK_Staff_TO_outboundRequest_1
+                                     FOREIGN KEY (staff_id) REFERENCES Staff (staff_id),
+                                 CONSTRAINT FK_WAREHOUSE_TO_outboundRequest_1
+                                     FOREIGN KEY (warehouse_id) REFERENCES WAREHOUSE (warehouse_id)
 );
+
 
 -- ===========================
 -- 14. outboundItem
@@ -239,38 +240,41 @@ CREATE TABLE `outboundOrder` (
 -- ===========================
 -- 16. dispatch
 -- ===========================
-CREATE TABLE `dispatch` (
-    `dispatch_ID` int NOT NULL AUTO_INCREMENT,
-    `approvedOrder_ID` int NOT NULL,
-    `carID` int NULL,
-    `Cartype` varchar(20) NULL,
-    `driverName` varchar(10) NULL,
-    `assignedDate` TIMESTAMP NULL,
-    `dispatchStatus` varchar(10) NULL,
-    `loadedBOX` int NULL,
-    `maximumBOX` int NULL,
-    PRIMARY KEY (`dispatch_ID`),
-    CONSTRAINT `FK_outboundOrder_TO_dispatch_1`
-        FOREIGN KEY (`approvedOrder_ID`) REFERENCES `outboundOrder` (`approvedOrder_ID`)
+CREATE TABLE dispatch (
+                          dispatch_ID      INT AUTO_INCREMENT PRIMARY KEY,
+                          approvedOrder_ID INT NOT NULL,
+                          carID            INT NULL,
+                          Cartype          VARCHAR(20) NULL,
+                          driverName       VARCHAR(10) NULL,
+                          assignedDate     TIMESTAMP NULL,
+                          dispatchStatus   VARCHAR(10) NULL,
+                          loadedBOX        INT NULL,
+                          maximumBOX       INT NULL,
+                          driver_id        INT NULL,
+                          CONSTRAINT FK_outboundOrder_TO_dispatch_1
+                              FOREIGN KEY (approvedOrder_ID) REFERENCES outboundOrder (approvedOrder_ID),
+                          CONSTRAINT fk_dispatch_driver
+                              FOREIGN KEY (driver_id) REFERENCES driver (driver_id)
 );
+
 
 -- ===========================
 -- 17. waybill
 -- ===========================
-CREATE TABLE `waybill` (
-    `waybill_id` int NOT NULL AUTO_INCREMENT,
-    `waybill_number` int NULL,
-    `waybill_date` TIMESTAMP NULL,
-    `waybill_status` varchar(20) NULL,
-    `dispatch_ID` int NOT NULL,
-    `departure_Address` varchar(100) NULL,
-    `arrival_Address` varchar(100) NULL,
-    `sender_Name` varchar(10) NULL,
-    `receiver_Name` varchar(10) NULL,
-    PRIMARY KEY (`waybill_id`),
-    CONSTRAINT `FK_dispatch_TO_waybill_1`
-        FOREIGN KEY (`dispatch_ID`) REFERENCES `dispatch` (`dispatch_ID`)
+CREATE TABLE waybill (
+                         waybill_id        INT AUTO_INCREMENT PRIMARY KEY,
+                         waybill_number    VARCHAR(50) NULL,
+                         waybill_date      TIMESTAMP NULL,
+                         waybill_status    VARCHAR(20) NULL,
+                         dispatch_ID       INT NOT NULL,
+                         departure_Address VARCHAR(100) NULL,
+                         arrival_Address   VARCHAR(100) NULL,
+                         sender_Name       VARCHAR(10) NULL,
+                         receiver_Name     VARCHAR(10) NULL,
+                         CONSTRAINT FK_dispatch_TO_waybill_1
+                             FOREIGN KEY (dispatch_ID) REFERENCES dispatch (dispatch_ID)
 );
+
 
 -- ===========================
 -- 18. QR
