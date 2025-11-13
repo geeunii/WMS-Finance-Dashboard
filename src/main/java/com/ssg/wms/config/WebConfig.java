@@ -24,5 +24,12 @@ public class WebConfig implements WebMvcConfigurer {
                         "/admin/**",
                         "*/admin/**"
                 );
+
+        registry.addInterceptor(new StatusCheckInterceptor("INACTIVE"))
+                .excludePathPatterns(
+                        "*/member/**",
+                        "/member/**"
+                );
+
     }
 }

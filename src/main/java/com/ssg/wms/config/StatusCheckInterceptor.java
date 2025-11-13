@@ -11,11 +11,11 @@ import java.util.List;
 
 @Component
 public class StatusCheckInterceptor implements HandlerInterceptor {
-    private final List<String> allowedStatus;
+    private final List<String> disallowedStatus;
 
     // 생성자로 허용할 역할 목록을 주입
     public StatusCheckInterceptor(String... status) {
-        this.allowedStatus = Arrays.asList(status);
+        this.disallowedStatus = Arrays.asList(status);
     }
 
     @Override
@@ -31,9 +31,9 @@ public class StatusCheckInterceptor implements HandlerInterceptor {
 
         String status = (String) session.getAttribute("status");
 
-        // 허용된 권한에 포함되는지 검사
-        if (!allowedStatus.contains(status)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "비활성화된 .");
+        // 비허용된 권한에 포함되는지 검사
+        if (disallowedStatus.contains(status)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "비활성화된 계정입니다.");
             return false;
         }
 

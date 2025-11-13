@@ -51,8 +51,16 @@
                                 <input type="text" class="form-control" id="createdAt" name="createdAt"
                                        value="${loginMember.createdAt}" readonly/>
                             </div>
-
-
+                            <div class="mb-3 col-md-6">
+                                <label for="businessNumber" class="form-label">사업자등록번호</label>
+                                <input type="text" class="form-control" id="businessNumber" name="businessNumber"
+                                       value="${loginMember.businessNumber}" readonly/>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label for="status" class="form-label">계정상태</label>
+                                <input type="text" class="form-control" id="status" name="status"
+                                       value="${loginMember.status}" readonly/>
+                            </div>
 
                         </div>
                         <div class="mt-2">
@@ -62,31 +70,38 @@
                     </form>
                 </div>
             </div>
-            <div class="card">
-                <h5 class="card-header">계정 삭제</h5>
-                <div class="card-body">
-                    <div class="mb-3 col-12 mb-0">
-                        <div class="alert alert-warning">
-                            <h6 class="alert-heading fw-bold mb-1">정말로 계정을 삭제하시겠습니까?</h6>
-                            <p class="mb-0">계정이 삭제되면 되돌릴 수 없습니다. 신중하게 결정해주세요.</p>
-                        </div>
-                    </div>
-                    <form id="formAccountDeactivation" onsubmit="return false">
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" name="accountActivation"
-                                   id="accountActivation"/>
-                            <label class="form-check-label" for="accountActivation">계정 삭제에 동의합니다.</label>
-                        </div>
-                        <button type="submit" class="btn btn-danger deactivate-account">계정 삭제</button>
-                    </form>
-                </div>
-            </div>
+
         </div>
     </div>
 </div>
 
 <script>
+    const roleMap = {
+        ADMIN: "총관리자",
+        MANAGER: "창고관리자",
+        MEMBER: "일반회원"
+    };
+
+    const statusMap = {
+        PENDING: "승인대기",
+        REJECTED: "승인거절",
+        ACTIVE: "활성",
+        INACTIVE: "비활성"
+    };
+
     document.addEventListener('DOMContentLoaded', function() {
+        const roleInput = document.getElementById("role");
+        const statusInput = document.getElementById("status");
+
+        if (roleInput && roleMap[roleInput.value]) {
+            roleInput.value = `\${roleMap[roleInput.value]}`;
+        }
+
+        if (statusInput && statusMap[statusInput.value]) {
+            statusInput.value = `\${statusMap[statusInput.value]}`;
+        }
+
+
         const form = document.getElementById('formAccountSettings');
         const submitBtn = form.querySelector('button[type="submit"]');
         const resetBtn = form.querySelector('button[type="reset"]');
