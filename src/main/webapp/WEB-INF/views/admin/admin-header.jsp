@@ -104,7 +104,7 @@
             <ul class="menu-inner py-1">
 
                 <li class="menu-item ${pageActive == 'dashboard' ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/dashboard" class="menu-link">
+                    <a href="${pageContext.request.contextPath}/admin/dashboard" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-home-circle"></i>
                         <div data-i18n="Analytics">Dashboard</div>
                     </a>

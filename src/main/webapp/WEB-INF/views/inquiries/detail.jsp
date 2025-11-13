@@ -69,19 +69,39 @@
                             <i class="bx bx-edit me-1"></i> 수정
                         </a>
 
-                        <form method="post"
-                              action="/inquiries/${inquiry.inquiryId}/delete"
-                              style="display: inline;"
-                              onsubmit="return confirmDelete()">
-                            <button type="submit" class="btn btn-danger">
-                                <i class="bx bx-trash me-1"></i> 삭제
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-danger" onclick="openDeleteModal(${inquiry.inquiryId})">
+                            <i class="bx bx-trash me-1"></i> 삭제
+                        </button>
+
                     </div>
                 </c:if>
             </div>
         </div>
     </div>
+
+    <!-- ✅ 비밀번호 입력 모달 -->
+    <div class="modal" id="deleteModal" tabindex="-1" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">비밀번호 확인</h5>
+                    <button type="button" class="btn-close" onclick="closeDeleteModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <p>삭제를 진행하려면 비밀번호를 입력하세요.</p>
+                    <input type="password" id="deletePassword" class="form-control" placeholder="비밀번호 입력">
+                    <input type="hidden" id="deleteInquiryId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">취소</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmDelete()">삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ form은 JS에서 동적으로 제출 -->
+    <form id="deleteForm" method="post" style="display:none;"></form>
 
     <!-- 답글 섹션 -->
     <div class="card mt-4">
@@ -199,6 +219,13 @@
 
     // 페이지 로드 시 답글 목록 조회
     document.addEventListener('DOMContentLoaded', function() {
+        // 모달 열기
+        function openDeleteModal(inquiryId) {
+            document.getElementById("deleteInquiryId").value = inquiryId;
+            document.getElementById("deletePassword").value = "";
+            document.getElementById("deleteModal").style.display = "block";
+        }
+        window.openDeleteModal = openDeleteModal; // 전역으로 노출
         loadReplies();
     });
 
@@ -374,8 +401,52 @@
         const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
         return text ? text.toString().replace(/[&<>"']/g, m => map[m]) : '';
     }
-</script>
 
+    /* 문의글 지우는 모달 */
+
+    // 모달 닫기
+    function closeDeleteModal() {
+        document.getElementById("deleteModal").style.display = "none";
+    }
+
+    // 삭제 확인
+    function confirmDelete() {
+        const password = document.getElementById("deletePassword").value.trim();
+        const inquiryId = document.getElementById("deleteInquiryId").value;
+
+        if (!password) {
+            alert("비밀번호를 입력해주세요.");
+            return;
+        }
+
+        if (confirm("정말 삭제하시겠습니까?")) {
+            // POST form 생성
+            const form = document.getElementById("deleteForm");
+            form.action = `/inquiries/\${inquiryId}/delete`;
+            form.method = "post";
+
+            // ✅ 기존 form 내용 초기화
+            form.innerHTML = '';
+
+            // ✅ inquiryId 파라미터 추가
+            const inquiryIdInput = document.createElement("input");
+            inquiryIdInput.type = "hidden";
+            inquiryIdInput.name = "inquiryId";
+            inquiryIdInput.value = inquiryId;
+            form.appendChild(inquiryIdInput);
+
+            // ✅ 비밀번호 파라미터 추가
+            const passwordInput = document.createElement("input");
+            passwordInput.type = "hidden";
+            passwordInput.name = "password";
+            passwordInput.value = password;
+            form.appendChild(passwordInput);
+
+            form.submit();
+        }
+    }
+
+</script>
 
 <c:choose>
     <c:when test="${sessionScope.role eq 'ADMIN'}">
