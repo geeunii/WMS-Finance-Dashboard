@@ -48,11 +48,18 @@
         r.outboundDate,
         r.approvedStatus,
         p.partner_name AS partnerName,
-        m.member_name AS driverName
+        m.member_name AS driverName,
+        w.warehouse_id AS warehouseId,
+        w.name AS warehouseName
         FROM outboundRequest r
-        LEFT JOIN outboundOrder o ON r.outboundRequest_ID = o.outboundRequest_ID
-        LEFT JOIN member m ON r.member_id = m.member_id
-        LEFT JOIN partner p ON m.partner_id = p.partner_id
+        LEFT JOIN outboundOrder o
+        ON r.outboundRequest_ID = o.outboundRequest_ID
+        LEFT JOIN member m
+        ON r.member_id = m.member_id
+        LEFT JOIN partner p
+        ON m.partner_id = p.partner_id
+        LEFT JOIN WAREHOUSE w
+        ON r.warehouse_id = w.warehouse_id
         ORDER BY r.outboundDate DESC
     </select>
 
@@ -113,6 +120,7 @@
         UPDATE outboundOrder
         SET
         orderStatus = #{approvedStatus},
+
         approvedDate = NOW()
         WHERE approvedOrder_ID = #{approvedOrderID}
     </update>

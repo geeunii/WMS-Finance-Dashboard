@@ -4,6 +4,9 @@ import com.ssg.wms.common.Role;
 import com.ssg.wms.outbound.domain.Criteria;
 import com.ssg.wms.outbound.domain.dto.OutboundOrderDTO;
 import com.ssg.wms.outbound.service.OutboundOrderService;
+import com.ssg.wms.warehouse.dto.WarehouseListDTO;
+import com.ssg.wms.warehouse.dto.WarehouseSearchDTO;
+import com.ssg.wms.warehouse.service.WarehouseAdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -25,6 +28,8 @@ import java.util.Map;
 public class outboundOrderController {
 
     private final OutboundOrderService outboundOrderService;
+    private WarehouseAdminService warehouseAdminService;
+
 
     /** ADMIN 권한 체크 */
     private boolean isAdmin(HttpSession session) {
@@ -159,5 +164,17 @@ public class outboundOrderController {
             return ResponseEntity.status(500)
                     .body(Collections.singletonMap("error", "상태 조회 실패"));
         }
+    }
+
+
+    @GetMapping("/admin/dispatches/warehouses")
+    public ResponseEntity<List<WarehouseListDTO>> getWarehouseList() {
+
+        // 검색 조건 없이 전체 조회
+        WarehouseSearchDTO searchDTO = new WarehouseSearchDTO();
+
+        List<WarehouseListDTO> list = warehouseAdminService.findWarehouses(searchDTO);
+
+        return ResponseEntity.ok(list);
     }
 }
