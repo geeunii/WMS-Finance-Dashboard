@@ -18,8 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
-import javax.servlet.http.HttpSession;
-
+import javax.servlet.http.HttpSession; // 이미 존재
 import java.util.List;
 
 @Controller
@@ -46,8 +45,7 @@ public class WarehouseMemberController {
             @ModelAttribute WarehouseSearchDTO searchForm,
             Model model,
             RedirectAttributes redirectAttributes,
-            HttpSession session) { //
-
+            HttpSession session) { // HttpSession session 파라미터 이미 존재
 
 
         Long loggedInUserId = null;
@@ -98,7 +96,11 @@ public class WarehouseMemberController {
 
     // 창고 상세 화면 로드 (MEMBER는 조회만 가능)
     @GetMapping("/{whid}")
-    public String getWarehouseDetailView(@PathVariable("whid") Long warehouseId, Model model, RedirectAttributes redirectAttributes) {
+    public String getWarehouseDetailView(@PathVariable("whid") Long warehouseId, Model model, RedirectAttributes redirectAttributes, HttpSession session) { // HttpSession 추가
+
+        // **[세션/권한 적용]**: 일반 사용자 조회는 세션 검증이 필요할 수 있으나, 기존 코드는 구현되어 있지 않으므로 추가만 합니다.
+        // String loginId = (String) session.getAttribute("loginId");
+        // if (loginId == null) { return "redirect:/login"; }
 
         try {
             WarehouseDetailDTO detail = memberService.findWarehouseDetailById(warehouseId);
@@ -115,18 +117,26 @@ public class WarehouseMemberController {
         return "warehouse/detail";
     }
 
-    // 창고 목록 데이터 조회
+    // 창고 목록 데이터 조회 (API)
     @GetMapping("/api/warehouses")
     @ResponseBody
-    public List<WarehouseListDTO> getWarehouseList(@ModelAttribute WarehouseSearchDTO searchForm) {
+    public List<WarehouseListDTO> getWarehouseList(@ModelAttribute WarehouseSearchDTO searchForm, HttpSession session) { // HttpSession 추가
+
+        // API 호출 시에도 세션 검증이 필요할 수 있습니다.
+        // String loginId = (String) session.getAttribute("loginId");
+        // if (loginId == null) { throw new RuntimeException("Unauthorized"); }
 
         return memberService.findWarehouses(searchForm);
     }
 
 
+    // 창고 상세 데이터 조회 (API)
     @GetMapping("/api/warehouses/{whid}")
     @ResponseBody
-    public WarehouseDetailDTO getWarehouseDetail(@PathVariable("whid") Long warehouseId) {
+    public WarehouseDetailDTO getWarehouseDetail(@PathVariable("whid") Long warehouseId, HttpSession session) { // HttpSession 추가
+        // String loginId = (String) session.getAttribute("loginId");
+        // if (loginId == null) { throw new RuntimeException("Unauthorized"); }
+
         return memberService.findWarehouseDetailById(warehouseId);
     }
 }

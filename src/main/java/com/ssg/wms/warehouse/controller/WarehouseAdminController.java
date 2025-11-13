@@ -20,7 +20,7 @@ import lombok.extern.log4j.Log4j2; // 로그 추가
 
 //세션
 import com.ssg.wms.common.Role;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSession; // HttpSession import
 
 @Log4j2 // 로그 사용을 위해 추가
 @Controller
@@ -46,7 +46,14 @@ public class WarehouseAdminController {
     // ------------------- 1. View Controller (화면 로드 및 폼 처리) -------------------
 
     @GetMapping({"", "/location"})
-    public String adminListIndex(@ModelAttribute("searchForm") WarehouseSearchDTO searchForm, Model model) {
+    public String adminListIndex(
+            @ModelAttribute("searchForm") WarehouseSearchDTO searchForm,
+            Model model,
+            HttpSession session) { // 세션 추가 (필요시 사용)
+
+        // **[세션/권한 적용]**: 관리자 권한 확인
+        String auth = validateAdminAccess(session);
+        if (auth != null) return auth;
 
         List<WarehouseListDTO> list = warehouseAdminService.findWarehouses(searchForm);
         model.addAttribute("warehouseList", list);
@@ -65,7 +72,12 @@ public class WarehouseAdminController {
     }
 
     @GetMapping("/register")
-    public String getWarehouseRegisterView(Model model) {
+    public String getWarehouseRegisterView(Model model, HttpSession session) {
+
+        //  관리자 권한 확인
+        String auth = validateAdminAccess(session);
+        if (auth != null) return auth;
+
         // DTO 객체가 이미 Flash Attribute로 넘어왔다면 재사용
         if (!model.containsAttribute("saveDTO")) {
             model.addAttribute("saveDTO", new WarehouseSaveDTO());
@@ -77,11 +89,16 @@ public class WarehouseAdminController {
     public String registerNewWarehouse(
             @Valid @ModelAttribute("saveDTO") WarehouseSaveDTO saveDTO,
             BindingResult bindingResult,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            HttpSession session) { // HttpSession 추가
 
         log.info("창고 등록 요청 시작. 주소: {}", saveDTO.getAddress());
 
+        //세션 기능
+        String auth = validateAdminAccess(session);
+        if (auth != null) return auth;
 
+        // 1. DTO 유효성 검사 (세션 검증 후 수행)
         if (bindingResult.hasErrors()) {
             // BindingResult와 입력 데이터를 Flash Attribute로 전달
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.saveDTO", bindingResult);
@@ -91,7 +108,10 @@ public class WarehouseAdminController {
         }
 
         try {
-            // Service 계층으로 전달 전 Admin ID 설정
+            // Long adminId = adminService.findStaffIdByStaffLoginId(loginId);
+            // saveDTO.setAdminId(adminId);
+
+            // Service 계층으로 전달 전 Admin ID 설정 (세션에서 가져온 ID로 설정해야 함)
             Long newWarehouseId = warehouseAdminService.saveWarehouse(saveDTO);
             log.info("창고 등록 성공. ID: {}", newWarehouseId);
 
@@ -127,7 +147,16 @@ public class WarehouseAdminController {
     // ------------------- (나머지 메서드는 변경 없음) -------------------
 
     @GetMapping("/{whid}")
-    public String getAdminDetailView(@PathVariable("whid") Long warehouseId, Model model, RedirectAttributes redirectAttributes) {
+    public String getAdminDetailView(
+            @PathVariable("whid") Long warehouseId,
+            Model model,
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
+
+        // **[세션/권한 적용]**: 관리자 권한 확인
+        String auth = validateAdminAccess(session);
+        if (auth != null) return auth;
+
         try {
             WarehouseDetailDTO detail = memberService.findWarehouseDetailById(warehouseId);
             model.addAttribute("detail", detail);
@@ -140,7 +169,16 @@ public class WarehouseAdminController {
     }
 
     @GetMapping("/{whid}/modify")
-    public String getModifyForm(@PathVariable("whid") Long warehouseId, Model model, RedirectAttributes redirectAttributes) {
+    public String getModifyForm(
+            @PathVariable("whid") Long warehouseId,
+            Model model,
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
+
+        // **[세션/권한 적용]**: 관리자 권한 확인
+        String auth = validateAdminAccess(session);
+        if (auth != null) return auth;
+
         try {
             WarehouseDetailDTO detailDTO = memberService.findWarehouseDetailById(warehouseId);
             model.addAttribute("detailDTO", detailDTO);
@@ -156,17 +194,28 @@ public class WarehouseAdminController {
     }
 
     @PostMapping("/{whid}")
-    public String updateWarehouse(@PathVariable("whid") Long warehouseId,
-                                  @Valid @ModelAttribute("updateDTO") WarehouseUpdateDTO updateDTO,
-                                  BindingResult bindingResult,
-                                  RedirectAttributes redirectAttributes) {
+    public String updateWarehouse(
+            @PathVariable("whid") Long warehouseId,
+            @Valid @ModelAttribute("updateDTO") WarehouseUpdateDTO updateDTO,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            HttpSession session) { // HttpSession 추가
+
+        // **[세션/권한 적용]**: 관리자 권한 확인 및 리다이렉트
+        String auth = validateAdminAccess(session);
+        if (auth != null) return auth;
+
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.updateDTO", bindingResult);
             redirectAttributes.addFlashAttribute("updateDTO", updateDTO);
             return "redirect:/admin/warehouses/" + warehouseId + "/modify";
         }
 
+
         try {
+            // Long adminId = adminService.findStaffIdByStaffLoginId(loginId);
+            // updateDTO.setAdminId(adminId);
+
             warehouseAdminService.updateWarehouse(warehouseId, updateDTO);
 
             redirectAttributes.addFlashAttribute("message", warehouseId + "번 창고 수정이 완료되었습니다.");
@@ -180,7 +229,15 @@ public class WarehouseAdminController {
     }
 
     @PostMapping("/{whid}/delete")
-    public String deleteWarehouse(@PathVariable("whid") Long warehouseId, RedirectAttributes redirectAttributes) {
+    public String deleteWarehouse(
+            @PathVariable("whid") Long warehouseId,
+            RedirectAttributes redirectAttributes,
+            HttpSession session) { // 세션 추가
+
+        // **[세션/권한 적용]**: 관리자 권한 확인
+        String auth = validateAdminAccess(session);
+        if (auth != null) return auth;
+
         try {
             warehouseAdminService.deleteWarehouse(warehouseId);
             redirectAttributes.addFlashAttribute("message", "창고(" + warehouseId + ")가 삭제되었습니다.");
@@ -197,5 +254,39 @@ public class WarehouseAdminController {
     @ResponseBody
     public Boolean checkNameDuplication(@RequestParam String name) {
         return warehouseAdminService.checkNameDuplication(name);
+    }
+
+    // ------------------- 2. 관리자 접근 권한 검사 헬퍼 메서드 -------------------
+
+    /**
+     * 로그인 및 ADMIN 권한을 확인하고, 권한이 없을 경우 리다이렉트 경로를 반환합니다.
+     * @param session 현재 HttpSession
+     * @return 권한이 없을 경우 리다이렉트 경로 (예: "redirect:/login"), 통과 시 null
+     */
+    private String validateAdminAccess(HttpSession session) {
+        if (!isLoggedIn(session)) {
+            // 로그인 안 됨 → /login
+            return "redirect:/login";
+        }
+        if (!isAdmin(session)) {
+            // 로그인됨 + ADMIN 아님 → /error/403
+            return "redirect:/error/403";
+        }
+        return null; // 통과
+    }
+
+    /**
+     * 세션에서 ADMIN 권한을 가지고 있는지 체크합니다.
+     */
+    private boolean isAdmin(HttpSession session) {
+        Object role = session.getAttribute("role");
+        return role != null && role.equals(Role.ADMIN);
+    }
+
+    /**
+     * 세션에서 로그인 상태인지 체크합니다.
+     */
+    private boolean isLoggedIn(HttpSession session) {
+        return session.getAttribute("loginId") != null;
     }
 }

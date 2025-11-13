@@ -13,6 +13,8 @@ import org.springframework.ui.Model;
 
 import javax.validation.Valid;
 import java.util.List;
+import javax.servlet.http.HttpSession; // HttpSession import 추가
+import com.ssg.wms.common.Role; // Role import 추가
 
 @Controller
 // Tomcat Manager 충돌 방지를 위해 경로를 /mgr/warehouses로 변경
@@ -21,7 +23,7 @@ public class WarehousesManagerController {
 
     private final WarehouseManagerService warehouseManagerService;
     private final WarehouseMemberService memberService;
-    private static final Long MOCK_ADMIN_ID = 1L;
+    private static final Long MOCK_ADMIN_ID = 1L; // 이 값은 세션에서 가져온 ID로 대체되어야 합니다.
 
     @Autowired
     public WarehousesManagerController(
@@ -50,12 +52,25 @@ public class WarehousesManagerController {
     @PostMapping("/register")
     public String registerNewWarehouse(@Valid @ModelAttribute("saveDTO") WarehouseSaveDTO saveDTO,
                                        BindingResult bindingResult,
-                                       RedirectAttributes redirectAttributes) {
+                                       RedirectAttributes redirectAttributes,
+                                       HttpSession session) { // HttpSession 추가
         if (bindingResult.hasErrors()) {
             return "warehouse/register";
         }
 
+        // **[세션/권한 적용]**
+        String loginId = (String) session.getAttribute("loginId");
+        Object roleObj = session.getAttribute("role");
+
+        if (loginId == null || roleObj == null || !roleObj.equals(Role.MANAGER)) {
+            redirectAttributes.addFlashAttribute("error", "로그인 정보가 유효하지 않거나 권한이 없습니다.");
+            return "redirect:/login";
+        }
+
         try {
+            // Service 계층으로 전달 전 Admin ID 설정
+            // 실제 구현: Long adminId = warehouseManagerService.findManagerIdByLoginId(loginId);
+            // saveDTO.setAdminId(adminId); // 세션에서 가져온 ID로 설정 (현재 DTO에 setAdminId가 필요)
 
             Long newWarehouseId = warehouseManagerService.saveWarehouse(saveDTO);
 
@@ -104,7 +119,8 @@ public class WarehousesManagerController {
     public String updateWarehouse(@PathVariable("whid") Long warehouseId,
                                   @Valid @ModelAttribute("updateDTO") WarehouseUpdateDTO updateDTO,
                                   BindingResult bindingResult,
-                                  RedirectAttributes redirectAttributes) {
+                                  RedirectAttributes redirectAttributes,
+                                  HttpSession session) { // HttpSession 추가
 
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.updateDTO", bindingResult);
@@ -113,7 +129,18 @@ public class WarehousesManagerController {
             return "redirect:/mgr/warehouses/" + warehouseId + "/modify";
         }
 
+        // **[세션/권한 적용]**
+        String loginId = (String) session.getAttribute("loginId");
+        Object roleObj = session.getAttribute("role");
+
+        if (loginId == null || roleObj == null || !roleObj.equals(Role.MANAGER)) {
+            redirectAttributes.addFlashAttribute("error", "로그인 정보가 유효하지 않거나 권한이 없습니다.");
+            return "redirect:/login";
+        }
+
         try {
+            // 실제 구현: updateDTO.setAdminId(warehouseManagerService.findManagerIdByLoginId(loginId));
+
             warehouseManagerService.updateWarehouse(warehouseId, updateDTO);
             redirectAttributes.addFlashAttribute("message", warehouseId + "번 창고 수정이 완료되었습니다.");
 
