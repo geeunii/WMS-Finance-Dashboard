@@ -153,11 +153,6 @@
                                 <div data-i18n="Outbound List">출고지시서 조회/승인</div>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div data-i18n="Waybill">운송장 등록/조회</div>
-                            </a>
-                        </li>
                     </ul>
                 </li>
 
@@ -178,7 +173,7 @@
                             </a>
                         </li>
                         <li class="menu-item ${pageActive == 'stock_product_list' ? 'active' : ''}">
-                            <a href="#" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/productList/plist" class="menu-link">
                                 <div data-i18n="Product Status">품목 현황</div>
                             </a>
                         </li>

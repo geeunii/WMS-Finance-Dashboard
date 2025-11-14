@@ -165,7 +165,7 @@
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/productList/plist" class="menu-link">
                                 <div data-i18n="Account">품목 현황</div>
                             </a>
                         </li>
