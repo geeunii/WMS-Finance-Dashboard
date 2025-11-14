@@ -72,7 +72,7 @@ public class outboundOrderController {
         List<OutboundOrderDTO> list = outboundOrderService.getAllRequests(criteria, filterType);
         model.addAttribute("outboundOrders", list);
 
-        return "outbound/admin/outboundOrderList";
+        return "/outbound/admin/outboundOrderList";
     }
 
 
