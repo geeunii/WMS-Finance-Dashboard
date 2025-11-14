@@ -4,9 +4,8 @@ import com.ssg.wms.common.Role;
 import com.ssg.wms.outbound.domain.Criteria;
 import com.ssg.wms.outbound.domain.dto.OutboundOrderDTO;
 import com.ssg.wms.outbound.service.OutboundOrderService;
-import com.ssg.wms.warehouse.dto.WarehouseListDTO;
-import com.ssg.wms.warehouse.dto.WarehouseSearchDTO;
-import com.ssg.wms.warehouse.service.WarehouseAdminService;
+import com.ssg.wms.product_stock.dto.DropdownDTO;
+import com.ssg.wms.product_stock.mappers.dropDownMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -28,8 +27,7 @@ import java.util.Map;
 public class outboundOrderController {
 
     private final OutboundOrderService outboundOrderService;
-    private final WarehouseAdminService warehouseAdminService; // ⭐ final 추가
-
+    private final dropDownMapper dropdownMapper;
 
     /** ADMIN 권한 체크 */
     private boolean isAdmin(HttpSession session) {
@@ -48,12 +46,12 @@ public class outboundOrderController {
      */
     private String validateAdminAccess(HttpSession session) {
         if (!isLoggedIn(session)) {
-            return "redirect:/login";
+            return "redirect:/login";   // 로그인 안 했으면 로그인 페이지로
         }
         if (!isAdmin(session)) {
-            return "redirect:/error/403";
+            return "redirect:/error/403";       // 로그인 했지만 ADMIN 아님
         }
-        return null;
+        return null; // 통과
     }
 
 
@@ -72,7 +70,7 @@ public class outboundOrderController {
         List<OutboundOrderDTO> list = outboundOrderService.getAllRequests(criteria, filterType);
         model.addAttribute("outboundOrders", list);
 
-        return "/outbound/admin/outboundOrderList";
+        return "outbound/admin/outboundOrderList";
     }
 
 
@@ -91,6 +89,28 @@ public class outboundOrderController {
         model.addAttribute("dispatch", detail);
 
         return "outbound/admin/dispatchForm";
+    }
+
+    @GetMapping("/dispatches/warehouses")
+    @ResponseBody
+    public ResponseEntity<List<DropdownDTO>> getWarehouseListForDispatch(HttpSession session) {
+
+        if (!isLoggedIn(session))
+            return ResponseEntity.status(401).build();
+        if (!isAdmin(session))
+            return ResponseEntity.status(403).build();
+
+        log.info("창고 목록 조회 요청 (AJAX)");
+
+        try {
+            // DropDownMapper를 사용하여 재고가 있는 창고 목록을 조회
+            List<DropdownDTO> warehouseList = dropdownMapper.warehouseDropDown();
+            return ResponseEntity.ok(warehouseList);
+
+        } catch (Exception e) {
+            log.error("창고 목록 조회 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+        }
     }
 
 
@@ -117,12 +137,6 @@ public class outboundOrderController {
             if ("승인".equals(existingOrder.getApprovedStatus())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body("이미 승인된 건입니다.");
-            }
-
-
-            if ("완료".equals(existingOrder.getDispatchStatus())) {
-                return ResponseEntity.status(409)
-                        .body("이미 배차가 완료된 건입니다.");
             }
 
             if (dto.getLoadedBox() > dto.getMaximumBOX()) {
@@ -169,29 +183,6 @@ public class outboundOrderController {
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(Collections.singletonMap("error", "상태 조회 실패"));
-        }
-    }
-
-
-    // =======================
-    // ⭐ 창고 목록 조회 (배차 등록용)
-    // =======================
-    @GetMapping("/dispatches/warehouses")
-    @ResponseBody
-    public ResponseEntity<List<WarehouseListDTO>> getWarehouseList() {
-        log.info("📦 배차 등록용 창고 목록 조회 요청");
-
-        try {
-            // null 대신 빈 검색 조건으로 전체 창고 조회
-            WarehouseSearchDTO searchDTO = new WarehouseSearchDTO();
-            List<WarehouseListDTO> list = warehouseAdminService.findWarehouses(searchDTO);
-
-            log.info("창고 목록 조회 결과: {} 건", list.size());
-
-            return ResponseEntity.ok(list);
-        } catch (Exception e) {
-            log.error("창고 목록 조회 실패", e);
-            return ResponseEntity.status(500).body(Collections.emptyList());
         }
     }
 }
