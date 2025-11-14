@@ -5,7 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -14,8 +15,7 @@ import java.time.LocalDateTime;
 public class PhysicalInventoryRequest {
     private Long piId;
     // 등록 요청 필드
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
-    private LocalDateTime piDate;
+    private LocalDate piDate;
     private String piState;
     private Long staffId; // 담당자 ID
     private Long warehouseId;

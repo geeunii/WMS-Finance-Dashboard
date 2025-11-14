@@ -163,7 +163,7 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/admin/outbound" class="menu-link">
                                 <div data-i18n="Outbound List">출고지시서 조회/승인</div>
                             </a>
                         </li>
