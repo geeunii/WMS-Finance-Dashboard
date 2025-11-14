@@ -97,6 +97,7 @@ public class OutboundOrderServiceImpl implements OutboundOrderService {
                             .dispatchStatus(outboundOrderDTO.getDispatchStatus())
                             .loadedBox(outboundOrderDTO.getLoadedBox())
                             .maximumBox(outboundOrderDTO.getMaximumBOX())
+                            .warehouseId(outboundOrderDTO.getWarehouseId())
                             .build();
 
                     dispatchMapper.updateDispatchInformation(dispatchDTO);

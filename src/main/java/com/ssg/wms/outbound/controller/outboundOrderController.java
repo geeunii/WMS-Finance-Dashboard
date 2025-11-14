@@ -28,7 +28,7 @@ import java.util.Map;
 public class outboundOrderController {
 
     private final OutboundOrderService outboundOrderService;
-    private WarehouseAdminService warehouseAdminService;
+    private final WarehouseAdminService warehouseAdminService; // ⭐ final 추가
 
 
     /** ADMIN 권한 체크 */
@@ -48,12 +48,12 @@ public class outboundOrderController {
      */
     private String validateAdminAccess(HttpSession session) {
         if (!isLoggedIn(session)) {
-            return "redirect:/login";   // 로그인 안 했으면 로그인 페이지로
+            return "redirect:/login";
         }
         if (!isAdmin(session)) {
-            return "redirect:/error/403";       // 로그인 했지만 ADMIN 아님
+            return "redirect:/error/403";
         }
-        return null; // 통과
+        return null;
     }
 
 
@@ -119,6 +119,12 @@ public class outboundOrderController {
                         .body("이미 승인된 건입니다.");
             }
 
+
+            if ("완료".equals(existingOrder.getDispatchStatus())) {
+                return ResponseEntity.status(409)
+                        .body("이미 배차가 완료된 건입니다.");
+            }
+
             if (dto.getLoadedBox() > dto.getMaximumBOX()) {
                 return ResponseEntity.badRequest()
                         .body("출고 박스 수가 최대 적재량을 초과했습니다.");
@@ -167,14 +173,25 @@ public class outboundOrderController {
     }
 
 
-    @GetMapping("/admin/dispatches/warehouses")
+    // =======================
+    // ⭐ 창고 목록 조회 (배차 등록용)
+    // =======================
+    @GetMapping("/dispatches/warehouses")
+    @ResponseBody
     public ResponseEntity<List<WarehouseListDTO>> getWarehouseList() {
+        log.info("📦 배차 등록용 창고 목록 조회 요청");
 
-        // 검색 조건 없이 전체 조회
-        WarehouseSearchDTO searchDTO = new WarehouseSearchDTO();
+        try {
+            // null 대신 빈 검색 조건으로 전체 창고 조회
+            WarehouseSearchDTO searchDTO = new WarehouseSearchDTO();
+            List<WarehouseListDTO> list = warehouseAdminService.findWarehouses(searchDTO);
 
-        List<WarehouseListDTO> list = warehouseAdminService.findWarehouses(searchDTO);
+            log.info("창고 목록 조회 결과: {} 건", list.size());
 
-        return ResponseEntity.ok(list);
+            return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            log.error("창고 목록 조회 실패", e);
+            return ResponseEntity.status(500).body(Collections.emptyList());
+        }
     }
 }
