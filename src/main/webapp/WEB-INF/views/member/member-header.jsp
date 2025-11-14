@@ -188,12 +188,12 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/member/warehouses" class="menu-link">
                                 <div data-i18n="Account">창고 목록 조회</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/member/warehouses/location" class="menu-link">
                                 <div data-i18n="Account">창고 위치 조회</div>
                             </a>
                         </li>
