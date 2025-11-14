@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/dashboard")
+@RequestMapping("/admin/dashboard")
 @RequiredArgsConstructor
 @Log4j2
 public class DashboardController {
