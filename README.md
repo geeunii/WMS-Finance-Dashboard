@@ -51,12 +51,12 @@
 - **Build Tool:** Gradle
 - **WAS:** Apache Tomcat 9.0
 - **Connection Pool:** HikariCP
+- **Template Engine:** JSP
 
 ### Frontend
 - **Core:** HTML5, CSS3, JavaScript (ES6+)
 - **Library:** jQuery 3.x, Bootstrap 5
 - **Visualization:** ApexCharts.js 3.x
-- **Template Engine:** JSP
 
 ### Database
 - **DBMS:** MySQL 8.x
