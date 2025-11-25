@@ -405,8 +405,7 @@ http://localhost:8080
 
 ## 📬 Contact
 
-**GitHub:** [@fsdawer](https://github.com/fsdawer)  
-**Email:** [이메일 주소]  
+**Email:** [koo4934@gmail.com]  
 **Portfolio:** [포트폴리오 링크]
 
 ---
