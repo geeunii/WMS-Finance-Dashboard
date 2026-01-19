@@ -42,3 +42,9 @@ replay_pid*
 # OS specific
 .DS_Store
 Thumbs.db
+
+# Legacy용
+.classpath
+.project
+.settings
+bin
