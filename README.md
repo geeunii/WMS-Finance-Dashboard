@@ -147,8 +147,18 @@ erDiagram
 
 **[해결 과정]**
 
-* **쿼리 최적화:** MyBatis에서 `GROUP BY MONTH(date)`를 사용하여 연간 데이터를 **단 2번(매출 1회, 지출 1회)**의 쿼리로 조회하도록 변경.
-* **Java Stream API:** DB에서 가져온 데이터를 백엔드 메모리 상에서 `Map<Integer, Long>`으로 변환 후 매핑하여 연산 부하 분산.
+* **쿼리 최적화:** MyBatis에서 `GROUP BY`를 사용하여 연간 데이터를 **단 2번**의 쿼리로 조회.
+* **Java Stream API:** DB에서 가져온 데이터를 메모리 상에서 매핑하여 연산.
+
+```sql
+<select id="selectYearlySales" resultType="SalesVO">
+    SELECT MONTH(sales_date) as month, SUM(amount) as totalAmount
+    FROM sales
+    WHERE YEAR(sales_date) = #{year}
+    GROUP BY MONTH(sales_date)
+</select>
+
+```
 
 **[결과]**
 
@@ -161,13 +171,20 @@ erDiagram
 
 **[문제 상황]**
 
-* 전월 또는 전년도 데이터가 '0'일 경우, 성장률 계산 시 `ArithmeticException` (division by zero) 발생.
-* 데이터가 없는 초기 단계에서 대시보드 전체가 렌더링되지 않는 오류.
+* 전월 매출이 '0'일 경우, 성장률 계산 시 `ArithmeticException` (Division by Zero) 발생.
+* 데이터가 없는 초기 단계에서 대시보드 렌더링 오류 발생.
 
 **[해결 과정]**
 
-* **방어 로직 구현:** 분모가 0일 경우를 체크하여, 0이 아닌 경우에만 연산을 수행하고 0일 경우 성장률을 특정 값(예: 100% 또는 0%)으로 처리하는 안전한 메서드 구현.
-* **예외 처리:** 데이터 부족 시 "집계 중" 또는 "-"로 표시되도록 프론트엔드 예외 처리 추가.
+* **방어 로직 구현:** 분모가 0인지 확인하는 삼항 연산자 로직 추가.
+
+```java
+// 전월 실적이 0원일 경우 예외 처리 (무한대/에러 방지)
+double growthRate = (lastMonthAmount == 0) 
+    ? (currentMonthAmount > 0 ? 100.0 : 0.0) 
+    : ((double)(currentMonthAmount - lastMonthAmount) / lastMonthAmount) * 100;
+
+```
 
 **[결과]**
 
@@ -184,8 +201,20 @@ erDiagram
 
 **[해결 과정]**
 
-* **@Transactional 적용:** 저장, 포맷팅, 갱신 과정을 하나의 트랜잭션으로 묶어 원자성(Atomicity) 보장.
-* **동시성 제어:** 비즈니스 로직 레벨에서 동시 요청을 제어하여 데이터 무결성 확보.
+* **@Transactional 적용:** 저장, 포맷팅, 갱신 과정을 하나의 트랜잭션으로 묶어 원자성 보장.
+
+```java
+@Transactional(rollbackFor = Exception.class)
+public void registerSales(SalesDTO salesDTO) {
+    // 1. 기본 정보 저장 (ID 생성)
+    salesMapper.insertSales(salesDTO);
+    // 2. 생성된 ID로 고유 전표 번호 포맷팅 (ex: SAL-20251021-001)
+    String serialNo = generateSerialNo(salesDTO.getId());
+    // 3. 전표 번호 업데이트 (원자성 보장)
+    salesMapper.updateSerialNo(salesDTO.getId(), serialNo);
+}
+
+```
 
 **[결과]**
 
@@ -237,6 +266,6 @@ src/main/java/com/ssg/wms/
 
 **Email:** [koo4934@gmail.com](mailto:koo4934@gmail.com)
 
-**Portfolio:** [https://geeunii.github.io](https://www.google.com/search?q=https://geeunii.github.io)
+**Portfolio:** [https://geeunii.github.io](https://geeunii.github.io)
 
 ---
