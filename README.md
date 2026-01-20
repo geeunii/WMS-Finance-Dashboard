@@ -1,4 +1,4 @@
-# 📦 RACL - 의류 중심 창고관리 시스템 (WMS)
+# 📦 RACL - 창고관리 시스템 (WMS)
 
 <div align="center">
 
