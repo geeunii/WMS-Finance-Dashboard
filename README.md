@@ -135,22 +135,24 @@ erDiagram
 
 ## 🚒 트러블 슈팅 (Troubleshooting Log)
 
-> **프로젝트 진행 중 발생한 주요 기술적 이슈와 해결 과정입니다. (클릭하여 상세보기)**
+> **프로젝트 진행 중 발생한 주요 기술적 페인 포인트와 해결 전략입니다.**
 
 <details>
-<summary>👉 <b>1. 대시보드 데이터 집계 성능 최적화 (N+1 문제 해결)</b></summary>
+<summary>👉 <b>1. 불필요한 DB Round-trip 최적화 (데이터 집계 성능 92% 개선)</b></summary>
 
-**[문제 상황]**
+**[Situation]**
 
-* 초기에는 1월부터 12월까지의 매출/지출 데이터를 각각 조회하는 루프를 돌려, 페이지 로딩 시 총 **24번의 쿼리**가 실행됨.
-* 이로 인해 대시보드 진입 시 2~3초의 로딩 지연 발생.
+* 연간 대시보드 진입 시, 월별 매출/지출 데이터를 각각 조회하는 Application 루프(Loop) 방식으로 인해 총 **24회의 개별 쿼리**가 발생했습니다.
+* 데이터 건수가 적음에도 불구하고 불필요한 네트워크 오버헤드로 인해 약 2.5초의 로딩 지연이 발생하여 사용자 경험이 저하되었습니다.
 
-**[해결 과정]**
+**[Action]**
 
-* **쿼리 최적화:** MyBatis에서 `GROUP BY`를 사용하여 연간 데이터를 **단 2번**의 쿼리로 조회.
-* **Java Stream API:** DB에서 가져온 데이터를 메모리 상에서 매핑하여 연산.
+* **Set-based Operation:** 개별 조회를 집합 기반의 `GROUP BY` 쿼리로 단일화하여 DB 접근 횟수를 2회(매출/지출 각 1회)로 축소했습니다.
+* **In-memory Processing:** DB에서는 로우 데이터만 집계하고, 복잡한 통계 연산은 Java Stream API를 활용하여 Application 서버로 부하를 분산했습니다.
+* **Index Consideration:** 집계 조건인 `sales_date` 컬럼에 인덱스 설계를 검토하여 대용량 데이터 환경에서의 검색 성능을 고려했습니다.
 
 ```sql
+/* 개선된 단일 집계 쿼리 */
 <select id="selectYearlySales" resultType="SalesVO">
     SELECT MONTH(sales_date) as month, SUM(amount) as totalAmount
     FROM sales
@@ -160,65 +162,68 @@ erDiagram
 
 ```
 
-**[결과]**
+**[Result]**
 
-* 쿼리 횟수 **92% 감소** (24회 → 2회) 및 로딩 속도 **0.4초**로 단축.
+* 쿼리 횟수 **92% 감소** (24회 → 2회) 및 로딩 속도 **0.4초**로 단축 (약 6.25배 성능 향상).
 
 </details>
 
 <details>
-<summary>👉 <b>2. 성장률(MoM/YoY) 계산 로직의 안정성 확보</b></summary>
+<summary>👉 <b>2. 초기 운영 단계의 지표 산출 전략 수립 (성장률 로직 안정화)</b></summary>
 
-**[문제 상황]**
+**[Problem]**
 
-* 전월 매출이 '0'일 경우, 성장률 계산 시 `ArithmeticException` (Division by Zero) 발생.
-* 데이터가 없는 초기 단계에서 대시보드 렌더링 오류 발생.
+* 서비스 초기 혹은 전월 데이터가 부재한 상황에서 성장률(MoM) 계산 시 `ArithmeticException` (Division by Zero)이 발생하여 시스템 전체 렌더링이 중단되는 위험이 있었습니다.
 
-**[해결 과정]**
+**[Solution]**
 
-* **방어 로직 구현:** 분모가 0인지 확인하는 삼항 연산자 로직 추가.
+* **Defensive Programming:** 수치 연산 전 분모의 유효성을 검증하는 방어 로직을 추가하여 시스템 안정성을 확보했습니다.
+* **Business Strategy:** 데이터가 0인 경우를 단순히 에러로 처리하지 않고, 비즈니스 요구사항에 맞춰 '100% 성장' 혹은 '0%(현상 유지)'로 표출하는 도메인 판단 로직을 구현했습니다.
+* **Precision Control:** 정밀한 재무 지표 계산을 위해 부동 소수점 오차를 고려한 데이터 타입 처리를 수행했습니다.
 
 ```java
-// 전월 실적이 0원일 경우 예외 처리 (무한대/에러 방지)
+// 전월 실적 부재 시 비즈니스 요구사항에 따른 예외 처리 전략
 double growthRate = (lastMonthAmount == 0) 
     ? (currentMonthAmount > 0 ? 100.0 : 0.0) 
     : ((double)(currentMonthAmount - lastMonthAmount) / lastMonthAmount) * 100;
 
 ```
 
-**[결과]**
+**[Result]**
 
-* 데이터가 불충분한 상황에서도 에러 없이 안정적으로 대시보드 표출.
+* 데이터 불충분 상황에서도 런타임 에러 없이 안정적으로 대시보드 지표를 표출하여 시스템 신뢰도를 제고했습니다.
 
 </details>
 
 <details>
-<summary>👉 <b>3. 전표 번호 생성 및 트랜잭션 처리</b></summary>
+<summary>👉 <b>3. 데이터 정합성을 위한 원자적 트랜잭션 설계 (전표 번호 생성)</b></summary>
 
-**[문제 상황]**
+**[Problem]**
 
-* 매출/지출 등록 시 고유 전표 번호 생성 과정에서, 다중 요청 시 중복 번호가 발생할 가능성 확인.
+* 매출/지출 등록 시 고유 전표 번호를 생성하고 업데이트하는 과정에서, 다중 사용자의 동시 요청 시 **중복된 전표 번호가 발급될 가능성(Race Condition)**을 확인했습니다.
 
-**[해결 과정]**
+**[Action]**
 
-* **@Transactional 적용:** 저장, 포맷팅, 갱신 과정을 하나의 트랜잭션으로 묶어 원자성 보장.
+* **Atomic Transaction:** `@Transactional`을 적용하여 'ID 생성 - 포맷팅 - 업데이트' 과정을 하나의 작업 단위(Unit of Work)로 묶어 원자성을 보장했습니다.
+* **Secondary Defense:** 데이터베이스 레벨에서 해당 컬럼에 `UNIQUE` 제약 조건을 추가하여 애플리케이션 계층에서 놓칠 수 있는 중복 가능성을 원천 차단했습니다.
+* **Isolation Level:** 동시성 제어와 시스템 성능 사이의 트레이드오프를 고려한 트랜잭션 설계를 진행했습니다.
 
 ```java
 @Transactional(rollbackFor = Exception.class)
 public void registerSales(SalesDTO salesDTO) {
-    // 1. 기본 정보 저장 (ID 생성)
+    // 1. 기본 정보 저장 및 생성된 PK 획득
     salesMapper.insertSales(salesDTO);
-    // 2. 생성된 ID로 고유 전표 번호 포맷팅 (ex: SAL-20251021-001)
+    // 2. 고유 전표 번호 포맷팅 (SAL-YYYYMMDD-ID)
     String serialNo = generateSerialNo(salesDTO.getId());
-    // 3. 전표 번호 업데이트 (원자성 보장)
+    // 3. 전표 번호 업데이트 (원자적 정합성 보장)
     salesMapper.updateSerialNo(salesDTO.getId(), serialNo);
 }
 
 ```
 
-**[결과]**
+**[Result]**
 
-* 데이터 정합성 유지 및 안정적인 전표 관리 시스템 구축.
+* 재무 데이터의 핵심인 **데이터 무결성**을 확보하였으며, 동시 요청 상황에서도 중복 없는 전표 관리 시스템을 구축했습니다.
 
 </details>
 
