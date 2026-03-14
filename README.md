@@ -2,6 +2,11 @@
 
 <div align="center">
 
+![Project Status](https://img.shields.io/badge/status-completed-success?style=flat-square)
+![Spring](https://img.shields.io/badge/Spring_MVC-5.x-6DB33F?style=flat-square&logo=spring)
+![MySQL](https://img.shields.io/badge/MySQL-8.x-4479A1?style=flat-square&logo=mysql)
+![Java](https://img.shields.io/badge/Java-17-007396?style=flat-square&logo=openjdk)
+
 **팀명:** 빌더스 (Builders) | **팀 규모:** 6명
 
 **개발 기간:** 2025.11.07 ~ 2025.11.14 (8일)
@@ -28,7 +33,6 @@
 ## 🎯 프로젝트 소개
 
 **RACL**은 의류 산업에 특화된 창고관리 시스템(Warehouse Management System)입니다.
-
 실시간 재고 추적, 입출고 관리, 데이터 시각화를 통해 효율적인 물류 운영을 지원합니다.
 
 ### 💡 기획 배경
@@ -39,9 +43,9 @@
 
 ### 🎨 나의 역할
 
-**관리자 대시보드 시각화**와 **재무관리(매출/지출) 시스템**을 전담했습니다.
+**관리자 대시보드 시각화**와 **재무관리 시스템**을 전담했습니다.
 
-특히 복잡한 통계 데이터를 위한 **데이터 집계 파이프라인의 효율성**과 재무 데이터의 **무결성**을 확보하는 인프라 지향적 백엔드 설계에 집중했습니다.
+단순 기능 구현을 넘어, 복잡한 통계 데이터를 위한 **데이터 집계 파이프라인의 효율성**과 재무 데이터의 **무결성**을 확보하는 인프라 지향적 백엔드 설계에 집중했습니다.
 
 ---
 
@@ -52,13 +56,12 @@
 * **Language:** Java 17
 * **Framework:** Spring MVC 5.x
 * **ORM:** MyBatis 3.x
-* **Build Tool:** Gradle
-* **WAS:** Apache Tomcat 9.0
 * **Connection Pool:** HikariCP (고성능 커넥션 관리)
+* **Build Tool:** Gradle
 
 ### Frontend
 
-* **Core:** JavaScript (ES6+), jQuery, Bootstrap 5
+* **Library:** JavaScript (ES6+), jQuery 3.x, Bootstrap 5
 * **Visualization:** ApexCharts.js 3.x
 
 ### Database
@@ -70,9 +73,11 @@
 
 ## 🏗️ 시스템 아키텍처 (Architecture)
 
+![System Architecture](images/architecture.jpg)
+
 > **인프라 자원 효율성을 고려한 Spring MVC 패턴 기반의 데이터 흐름도입니다.**
 
-* **Presentation Layer:** JSP와 Bootstrap을 활용하여 사용자 요청(Request)을 처리하고 뷰(View)를 렌더링합니다.
+* **Presentation Layer:** JSP와 Bootstrap을 활용하여 사용자 요청을 처리하고 뷰를 렌더링합니다.
 * **Business Layer:** Spring MVC 컨트롤러와 서비스가 비즈니스 로직 및 WAS 계층의 데이터 가공을 수행합니다.
 * **Persistence Layer:** MyBatis와 HikariCP를 통해 안정적이고 성능 지향적인 DB 연동을 담당합니다.
 
@@ -118,19 +123,19 @@ erDiagram
 
 ### 1. 📊 관리자 대시보드 (Dashboard)
 
-창고 운영의 핵심 지표를 **ApexCharts**로 시각화하여 한눈에 파악할 수 있도록 구현했습니다.
+창고 운영의 핵심 지표를 **ApexCharts**로 시각화하여 구현했습니다.
 
-* **KPI 파이프라인:** 연간/월간 데이터를 WAS 계층에서 효율적으로 가공하여 순익 및 성장률 지표 산출.
+* **KPI 파이프라인:** 연간/월간 데이터를 WAS 계층에서 효율적으로 가공하여 순이익 및 성장률 산출.
 * **성장률 지표:** 전월(MoM), 전년(YoY) 대비 성장률을 산출하는 방어적 비즈니스 로직 구현.
 * **시각화:** 직관적인 UI 제공을 위한 다중 차트 레이아웃 설계.
 
 ### 2. 💰 재무 관리 시스템 (Sales & Expense)
 
-창고 운영에서 발생하는 매출과 비용을 체계적으로 관리하는 CRUD 시스템입니다.
+창고 운영 매출과 비용을 체계적으로 관리하는 CRUD 시스템입니다.
 
 * **RESTful API:** 자원 중심의 URL 설계를 통한 시스템 확장성 확보.
-* **데이터 정합성:** 거래처 및 창고 FK 제약조건 준수와 @Transactional 기반의 무결성 보장.
-* **필터링:** 동적 쿼리(MyBatis Dynamic SQL)를 활용한 정밀 데이터 조회.
+* **데이터 정합성:** FK 제약조건 준수와 `@Transactional` 기반의 무결성 보장.
+* **필터링:** MyBatis Dynamic SQL을 활용한 연도/월별 정밀 데이터 조회.
 
 ---
 
@@ -141,16 +146,25 @@ erDiagram
 
 **[Situation]**
 
-* 연간 대시보드 진입 시, 월별 데이터를 애플리케이션 루프 내에서 개별 조회(24회)하는 방식의 **Network I/O 오버헤드**로 약 2.5초의 지연 발생.
+* 연간 대시보드 진입 시, 월별 매출/지출 데이터를 각각 조회하는 루프 방식의 **Network I/O 오버헤드**로 총 24회의 개별 쿼리가 발생, 약 2.5초의 지연 발생.
 
 **[Action]**
 
-* **Set-based Operation:** MyBatis 매퍼에서 `GROUP BY` 집합 연산을 활용해 DB 접근을 2회로 축소하여 **DB Round-trip 최적화**.
-* **Resource Balancing:** 통계 가공 로직을 WAS(Java Stream API)로 이관하여 DB CPU 부하 경감 및 메모리 기반 고속 처리 구현.
+* **Set-based Operation:** 집합 기반의 `GROUP BY` 쿼리로 단일화하여 **DB Round-trip**을 2회로 축소.
+* **Resource Balancing:** 통계 연산은 Java Stream API를 활용해 WAS 계층으로 분산하여 DB CPU 부하 경감.
+
+```sql
+/* 개선된 단일 집계 쿼리 예시 */
+SELECT MONTH(sales_date) as month, SUM(amount) as totalAmount
+FROM sales
+WHERE YEAR(sales_date) = #{year}
+GROUP BY MONTH(sales_date)
+
+```
 
 **[Result]**
 
-* 쿼리 횟수 **92% 감소** 및 로딩 속도 **0.4초**로 단축 (인프라 리소스 효율화 증명).
+* 쿼리 횟수 **92% 감소** 및 응답 속도 **0.4초**로 단축 (인프라 리소스 효율화).
 
 </details>
 
@@ -163,11 +177,19 @@ erDiagram
 
 **[Solution]**
 
-* **Defensive Programming:** 수치 연산 전 유효성 검증 및 비즈니스 규칙에 따른 예외 처리 전략(Non-blocking UI) 구현.
+* **Defensive Programming:** 수치 연산 전 유효성을 검증하는 방어 로직을 추가하여 시스템 안정성 확보.
+
+```java
+// 전월 실적 부재 시 비즈니스 요구사항에 따른 예외 처리 전략
+double growthRate = (lastMonthAmount == 0) 
+    ? (currentMonthAmount > 0 ? 100.0 : 0.0) 
+    : ((double)(currentMonthAmount - lastMonthAmount) / lastMonthAmount) * 100;
+
+```
 
 **[Result]**
 
-* 데이터 불충분 상황에서도 안정적인 지표 표출로 시스템 신뢰도 제고.
+* 데이터 불충분 상황에서도 런타임 에러 없이 안정적으로 지표를 표출하여 시스템 신뢰도 제고.
 
 </details>
 
@@ -176,16 +198,25 @@ erDiagram
 
 **[Problem]**
 
-* 전표 번호 생성 과정에서 다중 사용자의 동시 요청 시 **Race Condition**으로 인한 중복 발급 가능성 확인.
+* 고유 전표 번호 생성 및 업데이트 과정에서 동시 요청 시 **Race Condition**으로 인한 중복 발급 가능성 확인.
 
 **[Action]**
 
-* **Atomic Transaction:** `@Transactional`을 적용하여 'ID 생성-업데이트' 전 과정을 하나의 원자적 작업 단위(Unit of Work)로 설계.
-* **Constraint Synergy:** DB 레벨의 `UNIQUE` 제약 조건을 병용하여 무결성 원천 차단.
+* **Atomic Transaction:** `@Transactional`을 적용하여 작업 단위를 원자화(Atomic)하고 데이터 무결성 보장.
+
+```java
+@Transactional(rollbackFor = Exception.class)
+public void registerSales(SalesDTO salesDTO) {
+    salesMapper.insertSales(salesDTO); // 1. PK 획득
+    String serialNo = generateSerialNo(salesDTO.getId()); // 2. 포맷팅
+    salesMapper.updateSerialNo(salesDTO.getId(), serialNo); // 3. 원자적 업데이트
+}
+
+```
 
 **[Result]**
 
-* 동시 요청 상황에서도 중복 없는 전표 관리와 **데이터 무결성** 확보.
+* 동시 요청 상황에서도 중복 없는 데이터 관리 시스템 구축.
 
 </details>
 
@@ -195,15 +226,15 @@ erDiagram
 
 ### 잘한 점 (Keep)
 
-* **성능 엔지니어링**: 단순히 기능을 만드는 데 그치지 않고, 인프라 자원 효율을 고려한 최적화로 성능을 획기적으로 개선했습니다.
+* **성능 엔지니어링**: 인프라 자원 효율을 고려한 쿼리 최적화로 사용자 경험을 개선했습니다.
 
 ### 아쉬운 점 (Problem)
 
-* **테스트 자동화 부족**: 짧은 개발 기간으로 인해 인프라 장애 시나리오에 대비한 단위 테스트 비중이 낮아 수동 검증에 의존했습니다.
+* **테스트 자동화**: 짧은 기간으로 인해 인프라 장애 시나리오에 대비한 단위 테스트(JUnit) 비중이 낮았습니다.
 
 ### 개선 방안 (Try)
 
-* **CI/CD 파이프라인**: 향후 **GitHub Actions**를 활용한 배포 자동화 및 IaC 도입을 통해 운영 환경의 일관성을 확보하고 싶습니다.
+* **CI/CD 파이프라인**: 향후 **GitHub Actions** 연동 및 IaC 도입을 통해 운영 환경의 일관성을 확보하고 싶습니다.
 
 ---
 
